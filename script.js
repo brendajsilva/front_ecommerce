@@ -3,7 +3,7 @@ const localProducts = [
         id: 1,
         nome: 'BMW S1000RR',
         preco: 82000.0,
-        imagem: '/frontend/images/bmws1000rr.png',
+        imagem: './images/bmws1000rr.png',
         destaque: true,
         descricao: 'Superbike alemã com motor 4 cilindros em linha de 999cc, 207 HP e 113 Nm de torque. Equipada com ABS, controle de tração, quickshifter e suspensão ajustável. Peso: 197kg.',
         categoria: 'Esportiva',
@@ -14,7 +14,7 @@ const localProducts = [
         id: 2,
         nome: 'Ducati Diavel V4',
         preco: 95000.0,
-        imagem: '/frontend/images/DucatiDiavel.png',
+        imagem: './images/DucatiDiavel.png',
         destaque: true,
         descricao: 'Power cruiser italiana com motor V4 Granturismo de 1158cc, 168 HP e 127 Nm de torque. Design agressivo, suspensão ajustável e freios Brembo. Peso: 218kg.',
         categoria: 'Custom',
@@ -25,7 +25,7 @@ const localProducts = [
         id: 3,
         nome: 'Ducati Panigale V4S',
         preco: 125000.0,
-        imagem: '/frontend/images/ducativ4s.png',
+        imagem: './images/ducativ4s.png',
         destaque: true,
         descricao: 'Superbike italiana com motor V4 de 1103cc, 214 HP e 124 Nm de torque. Equipada com winglets aerodinâmicos, Öhlins ajustável e quickshifter. Peso: 198kg.',
         categoria: 'Esportiva',
@@ -36,7 +36,7 @@ const localProducts = [
         id: 4,
         nome: 'Kawasaki Ninja H2R',
         preco: 135000.0,
-        imagem: '/frontend/images/h2r.png',
+        imagem: './images/h2r.png',
         destaque: true,
         descricao: 'Hyperbike japonesa com motor 4 cilindros supercharged de 998cc, 310 HP e 165 Nm de torque. Aceleração de 0-100km/h em 2.5s. Peso: 216kg.',
         categoria: 'Esportiva',
@@ -47,7 +47,7 @@ const localProducts = [
         id: 5,
         nome: 'Kawasaki Z1000',
         preco: 78000.0,
-        imagem: '/frontend/images/z1000.png',
+        imagem: './images/z1000.png',
         destaque: true,
         descricao: 'Naked sport japonesa com motor 4 cilindros em linha de 1043cc, 142 HP e 111 Nm de torque. Equipada com ABS, controle de tração e quickshifter. Peso: 221kg.',
         categoria: 'Naked',
@@ -155,7 +155,7 @@ function adicionarAoCarrinho(produtoId) {
 
 function verificarAutenticacao() {
     if (!userLogado && !window.location.href.includes('login.html') && !window.location.href.includes('cadastro.html')) {
-        window.location.href = 'frontend/login.html';
+        window.location.href = './login.html';
         return false;
     }
     return true;
@@ -172,7 +172,7 @@ function carregarProdutos() {
         card.innerHTML = `
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <img src="${prod.imagem}" alt="${prod.nome}" onerror="this.src='frontend/images/placeholder-moto.svg'"/>
+            <img src="${prod.imagem}" alt="${prod.nome}" onerror="this.src='./images/placeholder-moto.svg'"/>
             <h3>${prod.nome}</h3>
             <span class="price-tag">R$ ${prod.preco.toFixed(2)}</span>
           </div>
@@ -254,7 +254,7 @@ function carregarCarrinho() {
         itemDiv.className = "carrinho-item";
 
         itemDiv.innerHTML = `
-            <img src="${item.imagem || '/frontend/images/placeholder-moto.svg'}" alt="${item.nome}" class="item-image" onerror="this.src='/frontend/images/placeholder-moto.svg'">
+            <img src="${item.imagem || './images/placeholder-moto.svg'}" alt="${item.nome}" class="item-image" onerror="this.src='./images/placeholder-moto.svg'">
             <div class="item-details">
                 <span class="item-name">${item.nome}</span>
                 <span class="item-price">R$ ${item.preco.toFixed(2)}</span>
@@ -623,7 +623,7 @@ async function confirmarMetodoPagamento() {
             // Close modal and redirect to profile
             fecharModalPagamento();
             setTimeout(() => {
-                window.location.href = '/frontend/perfil.html';
+                window.location.href = './perfil.html';
             }, 2000);
         } else {
             const error = await response.json();

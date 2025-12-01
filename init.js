@@ -25,7 +25,7 @@ const produtosDestaque = [
     id: 2,
     nome: 'Ducati Diavel V4',
     preco: 95000.0,
-    imagem: './images/images/DucatiDiavel.png',
+    imagem: './images/DucatiDiavel.png',
     destaque: true,
     descricao: 'Power cruiser italiana com motor V4 Granturismo de 1158cc, 168 HP e 127 Nm de torque. Design agressivo, suspensão ajustável e freios Brembo. Peso: 218kg.',
     categoria: 'Custom',
@@ -36,7 +36,7 @@ const produtosDestaque = [
     id: 3,
     nome: 'Ducati Panigale V4S',
     preco: 125000.0,
-    imagem: './images/images/ducativ4s.png',
+    imagem: './images/ducativ4s.png',
     destaque: true,
     descricao: 'Superbike italiana com motor V4 de 1103cc, 214 HP e 124 Nm de torque. Equipada com winglets aerodinâmicos, Öhlins ajustável e quickshifter. Peso: 198kg.',
     categoria: 'Esportiva',
@@ -47,7 +47,7 @@ const produtosDestaque = [
     id: 4,
     nome: 'Kawasaki Ninja H2R',
     preco: 135000.0,
-    imagem: './images/images/h2r.png',
+    imagem: './images/h2r.png',
     destaque: true,
     descricao: 'Hyperbike japonesa com motor 4 cilindros supercharged de 998cc, 310 HP e 165 Nm de torque. Aceleração de 0-100km/h em 2.5s. Peso: 216kg.',
     categoria: 'Esportiva',
@@ -58,7 +58,7 @@ const produtosDestaque = [
     id: 5,
     nome: 'Kawasaki Z1000',
     preco: 78000.0,
-    imagem: './images/images/z1000.png',
+    imagem: './images/z1000.png',
     destaque: true,
     descricao: 'Naked sport japonesa com motor 4 cilindros em linha de 1043cc, 142 HP e 111 Nm de torque. Equipada com ABS, controle de tração e quickshifter. Peso: 221kg.',
     categoria: 'Naked',
@@ -91,7 +91,7 @@ async function fetchProductsAPI() {
       id: p.codProduto || p.id || 0,
       nome: p.nome || 'Produto',
       preco: parseFloat(p.preco || 0),
-      imagem: p.imagem_url || '/frontend/images/placeholder-moto.svg',
+      imagem: p.imagem_url || './images/placeholder-moto.svg',
       descricao: p.descricao || '',
       categoria: p.categoria || 'Esportiva',
       potencia: p.potencia || null,
@@ -115,7 +115,7 @@ function handleImageError(imgEl) {
     imgEl.replaceWith(placeholder);
   } catch (e) {
   // se algo falhar, tenta trocar a src para o placeholder local
-  try { imgEl.src = '/frontend/images/placeholder-moto.svg'; } catch (_) {}
+  try { imgEl.src = './images/placeholder-moto.svg'; } catch (_) {}
   }
 }
 
@@ -153,7 +153,7 @@ async function renderizarProdutosDestaque() {
         try {
           const imgPath = (typeof prod.imagem === 'string') ? prod.imagem.trim() : '';
           if (!imgPath) {
-            imgEl.src = window.location.origin + '/frontend/images/placeholder-moto.svg';
+            imgEl.src = window.location.origin + './images/placeholder-moto.svg';
           } else if (/^https?:\/\//i.test(imgPath)) {
             imgEl.src = imgPath;
           } else if (imgPath.startsWith('/')) {
@@ -164,7 +164,7 @@ async function renderizarProdutosDestaque() {
           }
         } catch (e) {
           console.error('Erro ao configurar imagem do produto', prod.nome, e);
-          imgEl.src = window.location.origin + '/frontend/images/placeholder-moto.svg';
+          imgEl.src = window.location.origin + './images/placeholder-moto.svg';
         }
         imgEl.onerror = function() { handleImageError(this); };
         imgWrap.appendChild(imgEl);
@@ -382,7 +382,7 @@ function renderizarProdutosFiltrados() {
     try {
       const imgPath = (typeof prod.imagem === 'string') ? prod.imagem.trim() : '';
       if (!imgPath) {
-        imgEl.src = window.location.origin + '/frontend/images/placeholder-moto.svg';
+        imgEl.src = window.location.origin + './images/placeholder-moto.svg';
       } else if (/^https?:\/\//i.test(imgPath)) {
         imgEl.src = imgPath;
       } else if (imgPath.startsWith('/')) {
@@ -392,7 +392,7 @@ function renderizarProdutosFiltrados() {
         imgEl.src = window.location.origin + '/' + cleaned;
       }
     } catch (e) {
-      imgEl.src = window.location.origin + '/frontend/images/placeholder-moto.svg';
+      imgEl.src = window.location.origin + './images/placeholder-moto.svg';
     }
     imgEl.onerror = function() { handleImageError(this); };
     imgWrap.appendChild(imgEl);
