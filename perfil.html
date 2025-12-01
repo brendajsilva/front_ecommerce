@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Perfil | Performance Motorizada</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="profile-page">
+  </div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo">Performance Motorizada</div>
+      <nav class="main-nav">
+        <a href="inicio.html">Início</a>
+        <a href="produtos.html">Motos</a>
+        <a href="quemsomos.html">Quem Somos</a>
+        <a href="contato.html">Contato</a>
+        <a href="perfil.html" class="active">Perfil</a>
+        <a href="admin.html" id="admin-link" style="display: none;">Admin</a>
+      </nav>
+      <div class="header-right">
+        <div class="search-wrap">
+          <input placeholder="Buscar motos..." class="search-input" />
+        </div>
+        <div class="cart-icon" onclick="window.location.href='carrinho.html'">
+          <span id="cart-count">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <h1>Perfil do Usuário</h1>
+    <section class="profile-info" aria-label="Informações do usuário">
+      <h2>Informações Pessoais</h2>
+      <div class="profile-data">
+        <p><strong>Nome:</strong> <span id="user-nome">Carregando...</span></p>
+        <p><strong>Email:</strong> <span id="user-email">Carregando...</span></p>
+        <p><strong>Telefone:</strong> <span id="user-telefone">Carregando...</span></p>
+        <p><strong>Endereço:</strong> <span id="user-endereco">Carregando...</span></p>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </section>
+    <section class="orders" aria-label="Histórico de pedidos">
+      <h2>Histórico de Pedidos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody id="orders-body">
+          <tr>
+            <td colspan="4" style="text-align: center;">Carregando pedidos...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    // Configure API base URL
+    window.API_BASE_URL = 'http://localhost:3000/api';
+
+    function logout() {
+      localStorage.removeItem('userLogado');
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      alert('Logout efetuado com sucesso!');
+      window.location.href = '/index.html';
+    }
+
+    // Load user profile data
+    async function carregarPerfilUsuario() {
+      try {
+        const response = await fetch(window.API_BASE_URL + '/usuarios/perfil', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const user = await response.json();
+          document.getElementById('user-nome').textContent = user.nome_completo || user.nome;
+          document.getElementById('user-email').textContent = user.email;
+          document.getElementById('user-telefone').textContent = user.telefone || 'Não informado';
+          document.getElementById('user-endereco').textContent = 'Carregando...';
+
+          // Load user addresses to show primary address
+          const enderecoResponse = await fetch(window.API_BASE_URL + '/enderecos', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          if (enderecoResponse.ok) {
+            const enderecos = await enderecoResponse.json();
+            const enderecoPrincipal = enderecos.find(end => end.is_principal);
+            if (enderecoPrincipal) {
+              document.getElementById('user-endereco').textContent =
+                `${enderecoPrincipal.logradouro}, ${enderecoPrincipal.numero} - ${enderecoPrincipal.bairro}`;
+            } else if (enderecos.length > 0) {
+              const endereco = enderecos[0];
+              document.getElementById('user-endereco').textContent =
+                `${endereco.logradouro}, ${endereco.numero} - ${endereco.bairro}`;
+            } else {
+              document.getElementById('user-endereco').textContent = 'Nenhum endereço cadastrado';
+            }
+          }
+        } else {
+          // Fallback to localStorage if API fails
+          const user = JSON.parse(localStorage.getItem('user')) || {};
+          document.getElementById('user-nome').textContent = user.nome || 'Nome não disponível';
+          document.getElementById('user-email').textContent = user.email || 'Email não disponível';
+          document.getElementById('user-telefone').textContent = user.telefone || 'Telefone não disponível';
+          document.getElementById('user-endereco').textContent = user.endereco || 'Endereço não disponível';
+        }
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        // Fallback to localStorage
+        const user = JSON.parse(localStorage.getItem('user')) || {};
+        document.getElementById('user-nome').textContent = user.nome || 'Erro ao carregar';
+        document.getElementById('user-email').textContent = user.email || 'Erro ao carregar';
+        document.getElementById('user-telefone').textContent = user.telefone || 'Erro ao carregar';
+        document.getElementById('user-endereco').textContent = user.endereco || 'Erro ao carregar';
+      }
+    }
+
+    // Load user orders
+    async function carregarPedidosUsuario() {
+      const ordersBody = document.getElementById('orders-body');
+      ordersBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Carregando pedidos...</td></tr>';
+
+      try {
+        const response = await fetch(window.API_BASE_URL + '/pedidos', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const pedidos = await response.json();
+          ordersBody.innerHTML = '';
+
+          if (pedidos && pedidos.length > 0) {
+            pedidos.forEach(pedido => {
+              const dataFormatada = new Date(pedido.dataPedido).toLocaleDateString('pt-BR');
+              const statusTraduzido = traduzirStatus(pedido.status);
+              const valorFormatado = `R$ ${parseFloat(pedido.valorTotal).toFixed(2)}`;
+
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${pedido.codPedido}</td>
+                <td>${dataFormatada}</td>
+                <td><span class="status-${pedido.status.toLowerCase()}">${statusTraduzido}</span></td>
+                <td>${valorFormatado}</td>
+              `;
+              ordersBody.appendChild(tr);
+            });
+          } else {
+            ordersBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum pedido encontrado.</td></tr>';
+          }
+        } else {
+          ordersBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #dc3545;">Erro ao carregar pedidos.</td></tr>';
+        }
+      } catch (error) {
+        console.error('Erro ao carregar pedidos:', error);
+        ordersBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #dc3545;">Erro de conexão.</td></tr>';
+      }
+    }
+
+    function traduzirStatus(status) {
+      const traducoes = {
+        'PENDENTE_PAGAMENTO': 'Pendente',
+        'PROCESSANDO_PAGAMENTO': 'Processando',
+        'PAGO': 'Pago',
+        'SEPARACAO_ESTOQUE': 'Separando',
+        'ENVIADO': 'Enviado',
+        'ENTREGUE': 'Entregue',
+        'CANCELADO': 'Cancelado'
+      };
+      return traducoes[status] || status;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarPerfilUsuario();
+      carregarPedidosUsuario();
+      verificarAdmin();
+    });
+
+    // Check if user is admin and show admin link
+    async function verificarAdmin() {
+      try {
+        const response = await fetch(window.API_BASE_URL + '/usuarios/perfil', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const user = await response.json();
+          if (user.tipo_usuario === 'ADMIN') {
+            const adminLink = document.getElementById('admin-link');
+            if (adminLink) {
+              adminLink.style.display = 'inline-block';
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao verificar tipo de usuário:', error);
+      }
+    }
+  </script>
+</body>
+</html>

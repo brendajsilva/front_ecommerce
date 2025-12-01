@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Performance Motorizada</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="images/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <div class="topbar">
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">Performance Motorizada</div>
+            <nav class="main-nav">
+                <a href="#home" class="active">Início</a>
+                <a href="./produtos.html">Motos</a>
+                <a href="./quemsomos.html">Quem Somos</a>
+                <a href="./contato.html">Contato</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-wrap">
+                    <input type="search" placeholder="Buscar motos, acessórios..." class="search-input" />
+                </div>
+                <div class="cart-icon" onclick="window.location.href='carrinho.html'">
+                    <span id="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="home" class="hero hero-landing">
+        <div class="hero-overlay">
+            <img src="images/páginainicial.png" alt="Imagem Página Inicial" class="hero-background" />
+        </div>
+        <div class="container hero-grid">
+            <div class="hero-copy">
+                <h1>Performance, estilo e exclusividade em cada curva</h1>
+                <p class="lead">Seleção curada das melhores motocicletas esportivas e de luxo, com garantia e atendimento personalizado.</p>
+                <div class="hero-actions">
+                    <a href="./produtos.html" class="btn-primary">Ver Motos</a>
+                    <a href="./contato.html" class="btn-secondary">Contato VIP</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="featured-motos">
+        <div class="container">
+            <h2 class="section-title">Motos em Destaque</h2>
+            <div class="motos-grid">
+                <div class="moto-card">
+                        <img src="images/bmws1000rr.png" alt="BMW S1000RR" />
+                        <h3>BMW S1000RR</h3>
+                        <p>Potência: 199 HP</p>
+                        <p>Preço: R$ 75.000,00</p>
+                    </div>
+                    <div class="moto-card">
+                        <img src="images/DucatiDiavel.png" alt="Ducati Diavel" />
+                        <h3>Ducati Diavel</h3>
+                        <p>Potência: 162 HP</p>
+                        <p>Preço: R$ 90.000,00</p>
+                    </div>
+                    <div class="moto-card">
+                        <img src="images/ducativ4s.png" alt="Ducati V4S" />
+                        <h3>Ducati V4S</h3>
+                        <p>Potência: 214 HP</p>
+                        <p>Preço: R$ 95.000,00</p>
+                    </div>
+                    <div class="moto-card">
+                        <img src="images/h2r.png" alt="Kawasaki H2R" />
+                        <h3>Kawasaki H2R</h3>
+                        <p>Potência: 300 HP</p>
+                        <p>Preço: R$ 110.000,00</p>
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sobre-section">
+        <div class="container">
+            <h2 class="section-title">Quem Somos</h2>
+            <p>Somos referência em vendas de motocicletas premium: curadoria, garantia estendida opcional e serviços pós-venda. Nosso foco é entregar experiência de compra exclusiva e segura.</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div>
+                <h4>Performance Motorizada</h4>
+                <p>Vendas de motos de luxo e esportivas — atendimento VIP.</p>
+            </div>
+            <div>
+                <p>© 2024 Performance Motorizada. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="init.js"></script>
+</body>
+</html>

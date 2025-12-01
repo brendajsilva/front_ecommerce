@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrinho | Performance Motorizada</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  </head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-contact">📞 (11) 99999-9999 &nbsp; • &nbsp; contato@motostore.com</div>
+      <div class="topbar-actions">
+        <a href="index.html" class="top-link">Entrar</a>
+        <a href="index.html" class="top-link">Cadastrar</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo">Performance Motorizada</div>
+      <nav class="main-nav">
+        <a href="inicio.html">Início</a>
+        <a href="produtos.html">Motos</a>
+        <a href="quemsomos.html">Quem Somos</a>
+        <a href="contato.html">Contato</a>
+      </nav>
+      <div class="header-right">
+        <div class="search-wrap">
+          <input placeholder="Buscar motos..." class="search-input" />
+        </div>
+        <div class="cart-icon" onclick="window.location.href='carrinho.html'">
+          <span id="cart-count">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container cart-page">
+    <div class="cart-header">
+      <h1>🛒 Meu Carrinho de Compras</h1>
+      <p class="cart-subtitle">Revise seus itens e finalize sua compra</p>
+    </div>
+
+    <div class="cart-content">
+      <!-- Cart Items -->
+      <div class="cart-items-section">
+        <div id="empty-cart" class="empty-cart" style="display: none;">
+          <div class="empty-cart-icon">🛒</div>
+          <h3>Seu carrinho está vazio</h3>
+          <p>Adicione alguns produtos incríveis ao seu carrinho!</p>
+          <a href="produtos.html" class="btn-primary">Ver Produtos</a>
+        </div>
+
+        <div id="cart-items-container">
+          <div class="cart-items-header">
+            <h2>Produtos Selecionados</h2>
+            <span class="items-count" id="items-count">0 itens</span>
+          </div>
+
+          <div class="cart-items-list" id="lista-carrinho">
+            <!-- Cart items will be loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="cart-summary">
+        <div class="summary-card">
+          <h3>📋 Resumo do Pedido</h3>
+
+          <div class="summary-row">
+            <span>Subtotal dos produtos</span>
+            <span id="subtotal">R$ 0,00</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Frete</span>
+            <span id="frete">A calcular</span>
+          </div>
+
+          <div class="summary-row total-row">
+            <strong>Total</strong>
+            <strong id="total-carrinho">R$ 0,00</strong>
+          </div>
+
+          <div class="shipping-notice">
+            <small>💡 Frete grátis para compras acima de R$ 50.000,00</small>
+          </div>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="address-card">
+          <h3>📍 Endereço de Entrega</h3>
+          <div id="endereco-selecionado" class="endereco-selecionado">
+            <div class="no-address">
+              <p>🚚 Selecione um endereço para entrega</p>
+              <button class="btn-secondary" onclick="abrirModalEnderecos()">Selecionar Endereço</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkout Actions -->
+        <div class="checkout-actions">
+          <button class="btn-primary btn-large" onclick="finalizarCompra()" id="checkout-btn" disabled>
+            🛍️ Finalizar Compra
+          </button>
+          <button class="btn-outline" onclick="esvaziarCarrinho()">
+            🗑️ Esvaziar Carrinho
+          </button>
+          <a href="produtos.html" class="btn-link">← Continuar Comprando</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal para seleção de endereço -->
+  <div id="modal-enderecos" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="fecharModalEnderecos()">&times;</span>
+      <h3>Selecionar Endereço de Entrega</h3>
+
+      <div id="lista-enderecos" class="lista-enderecos">
+        <!-- Endereços serão carregados aqui -->
+      </div>
+
+      <button class="btn-secondary" onclick="abrirModalNovoEndereco()">Adicionar Novo Endereço</button>
+    </div>
+  </div>
+
+  <!-- Modal para novo endereço -->
+  <div id="modal-novo-endereco" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="fecharModalNovoEndereco()">&times;</span>
+      <h3>Adicionar Novo Endereço</h3>
+
+      <form id="form-novo-endereco" class="endereco-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cep">CEP *</label>
+            <input type="text" id="cep" name="cep" placeholder="00000-000" required>
+            <button type="button" class="btn-small" onclick="buscarCEP()">Buscar</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="logradouro">Logradouro *</label>
+            <input type="text" id="logradouro" name="logradouro" required>
+          </div>
+          <div class="form-group">
+            <label for="numero">Número *</label>
+            <input type="text" id="numero" name="numero" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="complemento">Complemento</label>
+          <input type="text" id="complemento" name="complemento">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bairro">Bairro *</label>
+            <input type="text" id="bairro" name="bairro" required>
+          </div>
+          <div class="form-group">
+            <label for="localidade">Cidade *</label>
+            <input type="text" id="localidade" name="localidade" required>
+          </div>
+          <div class="form-group">
+            <label for="uf">UF *</label>
+            <input type="text" id="uf" name="uf" maxlength="2" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="apelido">Apelido (opcional)</label>
+          <input type="text" id="apelido" name="apelido" placeholder="Ex: Casa, Trabalho">
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="is_principal" name="is_principal"> Definir como endereço principal
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar Endereço</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para seleção de método de pagamento -->
+  <div id="modal-pagamento" class="modal" style="display: none;">
+    <div class="modal-content payment-modal">
+      <span class="close" onclick="fecharModalPagamento()">&times;</span>
+      <div class="modal-header">
+        <h3>💳 Selecione o Método de Pagamento</h3>
+        <p>Escolha como deseja pagar sua compra</p>
+      </div>
+
+      <div class="payment-methods-grid">
+        <label class="payment-card">
+          <input type="radio" name="metodo-pagamento-modal" value="CARTAO_CREDITO" checked>
+          <div class="payment-card-content">
+            <div class="payment-icon-large">💳</div>
+            <div class="payment-info">
+              <h4>Cartão de Crédito</h4>
+              <p>Pague em até 12x sem juros</p>
+            </div>
+            <div class="payment-check">✓</div>
+          </div>
+        </label>
+
+        <label class="payment-card">
+          <input type="radio" name="metodo-pagamento-modal" value="PIX">
+          <div class="payment-card-content">
+            <div class="payment-icon-large">📱</div>
+            <div class="payment-info">
+              <h4>PIX</h4>
+              <p>Pagamento instantâneo</p>
+            </div>
+            <div class="payment-check">✓</div>
+          </div>
+        </label>
+
+        <label class="payment-card">
+          <input type="radio" name="metodo-pagamento-modal" value="BOLETO">
+          <div class="payment-card-content">
+            <div class="payment-icon-large">📄</div>
+            <div class="payment-info">
+              <h4>Boleto Bancário</h4>
+              <p>Vencimento em 3 dias</p>
+            </div>
+            <div class="payment-check">✓</div>
+          </div>
+        </label>
+
+        <label class="payment-card">
+          <input type="radio" name="metodo-pagamento-modal" value="DEBITO_ONLINE">
+          <div class="payment-card-content">
+            <div class="payment-icon-large">🏦</div>
+            <div class="payment-info">
+              <h4>Débito Online</h4>
+              <p>Direto na sua conta</p>
+            </div>
+            <div class="payment-check">✓</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="fecharModalPagamento()">Cancelar</button>
+        <button type="button" class="btn-primary" onclick="confirmarMetodoPagamento()">Continuar para Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="init.js"></script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contato | Performance Motorizada</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Professional clean styling for contact page */
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem 1rem;
+      color: #f5f5f5;
+    }
+    header {
+      background-color: #1e293b;
+      padding: 1rem 0;
+    }
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 1rem;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #ff6f00;
+    }
+    nav a {
+      color: #bbbbbb;
+      margin: 0 0.75rem;
+      font-weight: 500;
+      text-decoration: none;
+      padding-bottom: 0.25rem;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+    nav a.active,
+    nav a:hover {
+      color: #ff6f00;
+      border-color: #ff6f00;
+    }
+    main h1 {
+      color: #e0e7ff;
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .contact-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3rem;
+    }
+    .contact-form, .contact-info {
+      background-color: #283046;
+      border-radius: 12px;
+      padding: 2rem;
+      flex: 1 1 400px;
+      box-shadow: 0 4px 20px rgba(10,20,40,0.6);
+    }
+    .contact-form h2, .contact-info h2 {
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-bottom: 1.25rem;
+      font-size: 1.75rem;
+      border-bottom: 2px solid #ff6f00;
+      padding-bottom: 0.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem; 
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      background-color: #394867;
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      color: #e0e7ff;
+      font-weight: 500;
+      resize: vertical;
+      transition: background-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    select:focus,
+    textarea:focus {
+      background-color: #333333;
+      outline: none;
+      box-shadow: 0 0 6px #ff6f00;
+      color: #e0e0e0;
+    }
+    button.btn-primary {
+      background: #ff6f00;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      color: #121212;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+    }
+    button.btn-primary:hover {
+      background-color: #e05e00;
+    }
+    .contact-info p {
+      color: #cbd5e1;
+      font-size: 1rem;
+      margin: 0.5rem 0 1.25rem 0;
+      line-height: 1.6;
+    }
+    .info-item h3 {
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-bottom: 0.6rem;
+      font-size: 1.25rem;
+    }
+    .map-container h3 {
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-top: 1rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.5rem;
+    }
+    iframe {
+      border-radius: 12px;
+      border: none;
+      width: 100%;
+      height: 280px;
+      box-shadow: 0 4px 24px rgba(20, 40, 90, 0.4);
+    }
+    @media (max-width: 768px) {
+      .contact-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">Performance Motorizada</div>
+      <nav>
+        <a href="login.html">Início</a>
+        <a href="produtos.html">Motos</a>
+        <a href="quemsomos.html">Quem Somos</a>
+        <a href="contato.html" class="active">Contato</a>
+        <a href="suporte.html">Suporte</a>
+        <a href="perfil.html">Perfil</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <h1>Entre em Contato</h1>
+    <div class="contact-section">
+      <form id="contact-form" class="contact-form" aria-label="Formulário de contato">
+        <h2>Envie sua Mensagem</h2>
+        <div class="form-group">
+          <label for="nome">Nome Completo *</label>
+          <input type="text" id="nome" name="nome" required />
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail *</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" name="telefone" />
+        </div>
+        <div class="form-group">
+          <label for="assunto">Assunto *</label>
+          <select id="assunto" name="assunto" required>
+            <option value="">Selecione um assunto</option>
+            <option value="suporte">Suporte Técnico</option>
+            <option value="vendas">Vendas</option>
+            <option value="devolucao">Devolução/Troca</option>
+            <option value="sugestao">Sugestão</option>
+            <option value="outros">Outros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="mensagem">Mensagem *</label>
+          <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Enviar Mensagem</button>
+      </form>
+      <section class="contact-info" aria-label="Informações de contato">
+        <h2>Informações de Contato</h2>
+        <div class="info-item">
+          <h3>📍 Endereço</h3>
+          <p>
+            Rua 800, 159<br />
+            Casa Branca, Itapema - SC<br />
+            CEP: 88220-000
+          </p>
+        </div>
+        <div class="info-item">
+          <h3>💬 WhatsApp</h3>
+          <p><a href="https://wa.me/5547984065226" target="_blank">(47) 9 8406-5226</a></p>
+        </div>
+        <div class="info-item">
+          <h3>📧 E-mail</h3>
+          <p>contato@motostore.com.br</p>
+        </div>
+        <div class="info-item">
+          <h3>📸 Instagram</h3>
+          <p><a href="https://www.instagram.com/julya_brendasouza/" target="_blank">@julya_brendasouza</a></p>
+        </div>
+        <div class="info-item">
+          <h3>🕒 Horário de Atendimento</h3>
+          <p>
+            Segunda a Sexta: 8h às 18h<br />
+            Sábado: 8h às 12h
+          </p>
+        </div>
+        <div class="map-container">
+          <h3>Nossa Localização</h3>
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.0000000000005!2d-48.6111!3d-27.0961!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94d8b10cf4da0413%3A0x231d20d09ad9775c!2sRua%20800%2C%20159%20-%20Casa%20Branca%2C%20Itapema%20-%20SC%2C%2088220-000!5e0!3m2!1spt-BR!2sbr!4v1630000000000!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+
+      try {
+        const response = await fetch('/api/contato', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+          this.reset();
+        } else {
+          const error = await response.json();
+          alert('Erro ao enviar mensagem: ' + (error.error || 'Tente novamente.'));
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro de conexão. Tente novamente.');
+      }
+    });
+  </script>
+</body>
+</html>

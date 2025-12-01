@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="images/logo_trial.png" />
+  <title>Painel Administrativo | Performance Motorizada</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      padding: 2rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .admin-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .admin-subtitle {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      margin: 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border: 1px solid #374151;
+    }
+
+    .stat-title {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0;
+    }
+
+    .stat-change {
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+
+    .stat-change.positive {
+      color: #10b981;
+    }
+
+    .stat-change.negative {
+      color: #ef4444;
+    }
+
+    .admin-content {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+    }
+
+    .admin-sidebar {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 1.5rem;
+      height: fit-content;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #374151;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 0.25rem;
+    }
+
+    .sidebar-menu button {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .sidebar-menu button:hover,
+    .sidebar-menu button.active {
+      background: #ff6f00;
+      color: white;
+    }
+
+    .admin-main {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #374151;
+    }
+
+    .data-table th {
+      background: #334155;
+      color: #f8fafc;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table tr:hover {
+      background: #334155;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-pendente { background: #fef3c7; color: #92400e; }
+    .status-pago { background: #d1fae5; color: #065f46; }
+    .status-enviado { background: #dbeafe; color: #1e40af; }
+    .status-entregue { background: #d1fae5; color: #065f46; }
+    .status-cancelado { background: #fee2e2; color: #991b1b; }
+
+    .action-btn {
+      background: #ff6f00;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #e55a00;
+    }
+
+    .action-btn.danger {
+      background: #ef4444;
+    }
+
+    .action-btn.danger:hover {
+      background: #dc2626;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 1024px) {
+      .admin-content {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-sidebar {
+        order: 2;
+      }
+
+      .admin-main {
+        order: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+
+      .admin-container {
+        padding: 1rem;
+      }
+
+      .admin-header {
+        padding: 1.5rem;
+      }
+
+      .admin-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <h1 class="admin-title">🎛️ Painel Administrativo</h1>
+      <p class="admin-subtitle">Gerencie pedidos, produtos e usuários do sistema</p>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Pedidos Hoje</div>
+        <div class="stat-value" id="pedidos-hoje">0</div>
+        <div class="stat-change positive">+12%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Receita Total</div>
+        <div class="stat-value" id="receita-total">R$ 0</div>
+        <div class="stat-change positive">+8%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Produtos Ativos</div>
+        <div class="stat-value" id="produtos-ativos">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Usuários Cadastrados</div>
+        <div class="stat-value" id="usuarios-total">0</div>
+        <div class="stat-change positive">+5%</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+      <button onclick="mostrarPainel('listar')" class="tab-btn active" id="tab-listar">
+        📋 Listar Produtos
+      </button>
+      <button onclick="mostrarPainel('cadastrar')" class="tab-btn" id="tab-cadastrar">
+        ➕ Cadastrar Produto
+      </button>
+      <button onclick="mostrarPainel('atualizar')" class="tab-btn" id="tab-atualizar">
+        ✏️ Atualizar Produto
+      </button>
+      <button onclick="mostrarPainel('consultar')" class="tab-btn" id="tab-consultar">
+        👁️ Consultar Produto
+      </button>
+      <button onclick="mostrarPainel('dashboard')" class="tab-btn" id="tab-dashboard">
+        📊 Dashboard
+      </button>
+    </div>
+
+    <!-- Listar Produtos Panel -->
+    <div id="painel-listar" class="admin-panel active">
+      <div class="panel-header">
+        <h2 class="panel-title">📋 Todos os Produtos</h2>
+      </div>
+
+      <div class="filters-bar">
+        <div class="search-box">
+          <input type="text" id="search-produto" placeholder="Buscar produto..." class="search-input">
+          <button onclick="filtrarProdutos()" class="action-btn">🔍</button>
+        </div>
+        <select id="filter-status" onchange="filtrarProdutos()" class="filter-select">
+          <option value="todos">Todos os Status</option>
+          <option value="ativo">Ativos</option>
+          <option value="inativo">Inativos</option>
+        </select>
+      </div>
+
+      <div id="produtos-loading" class="loading">Carregando produtos...</div>
+      <div id="produtos-error" class="error" style="display: none;"></div>
+
+      <div class="products-grid-admin" id="produtos-grid">
+        <!-- Products will be loaded here -->
+      </div>
+    </div>
+
+    <!-- Cadastrar Produto Panel -->
+    <div id="painel-cadastrar" class="admin-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">➕ Cadastrar Novo Produto</h2>
+      </div>
+
+      <form id="form-produto" class="product-form" onsubmit="event.preventDefault()">
+        <input type="hidden" id="produto-id">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome">Nome do Produto *</label>
+            <input type="text" id="nome" required>
+          </div>
+          <div class="form-group">
+            <label for="modelo">Modelo *</label>
+            <input type="text" id="modelo" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="preco">Preço (R$) *</label>
+            <input type="number" id="preco" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="quantidade_estoque">Quantidade em Estoque *</label>
+            <input type="number" id="quantidade_estoque" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="imagem_url">URL da Imagem</label>
+          <input type="url" id="imagem_url" placeholder="https://exemplo.com/imagem.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" rows="4" placeholder="Descreva o produto..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="ativo" checked>
+            Produto ativo (visível na loja)
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="action-btn secondary" onclick="limparFormulario()">Limpar</button>
+          <button type="submit" class="action-btn">Salvar Produto</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Atualizar Produto Panel -->
+    <div id="painel-atualizar" class="admin-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">✏️ Atualizar Produto</h2>
+        <p class="panel-subtitle">Selecione um produto da lista para editar</p>
+      </div>
+
+      <div id="atualizar-loading" class="loading">Selecione um produto para editar...</div>
+      <div id="atualizar-content" style="display: none;">
+        <form id="form-atualizar" class="product-form" onsubmit="event.preventDefault()">
+          <input type="hidden" id="atualizar-produto-id">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="atualizar-nome">Nome do Produto *</label>
+              <input type="text" id="atualizar-nome" required>
+            </div>
+            <div class="form-group">
+              <label for="atualizar-modelo">Modelo *</label>
+              <input type="text" id="atualizar-modelo" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="atualizar-preco">Preço (R$) *</label>
+              <input type="number" id="atualizar-preco" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label for="atualizar-quantidade_estoque">Quantidade em Estoque *</label>
+              <input type="number" id="atualizar-quantidade_estoque" min="0" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="atualizar-imagem_url">URL da Imagem</label>
+            <input type="url" id="atualizar-imagem_url" placeholder="https://exemplo.com/imagem.jpg">
+          </div>
+
+          <div class="form-group">
+            <label for="atualizar-descricao">Descrição</label>
+            <textarea id="atualizar-descricao" rows="4" placeholder="Descreva o produto..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="atualizar-ativo">
+              Produto ativo (visível na loja)
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="action-btn secondary" onclick="mostrarPainel('listar')">Cancelar</button>
+            <button type="submit" class="action-btn">Atualizar Produto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Consultar Produto Panel -->
+    <div id="painel-consultar" class="admin-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">👁️ Consultar Produto</h2>
+        <p class="panel-subtitle">Visualize detalhes completos de um produto</p>
+      </div>
+
+      <div id="consultar-loading" class="loading">Selecione um produto para consultar...</div>
+      <div id="consultar-content" style="display: none;">
+        <div id="produto-detalhes" class="product-details-view">
+          <!-- Product details will be shown here -->
+        </div>
+        <div class="form-actions">
+          <button type="button" class="action-btn secondary" onclick="mostrarPainel('listar')">Voltar à Lista</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Panel -->
+    <div id="painel-dashboard" class="admin-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">📊 Dashboard Administrativo</h2>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total de Produtos</div>
+          <div class="stat-value" id="total-produtos">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Produtos Ativos</div>
+          <div class="stat-value" id="produtos-ativos">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Valor Total em Estoque</div>
+          <div class="stat-value" id="valor-estoque">R$ 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Produtos sem Estoque</div>
+          <div class="stat-value" id="produtos-sem-estoque">0</div>
+        </div>
+      </div>
+
+      <div class="recent-activity">
+        <h3>Atividades Recentes</h3>
+        <div id="recent-activity-list" class="activity-list">
+          <p>Carregando atividades...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configure API base URL
+    window.API_BASE_URL = 'http://localhost:3000/api';
+
+    // Price formatting function
+    function formatoPreco(valor) {
+      const num = parseFloat(valor);
+      if (isNaN(num)) return 'R$ 0,00';
+      const formatted = num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      console.log('Formatting price:', valor, '->', formatted);
+      return formatted;
+    }
+
+    let currentPanel = 'listar';
+    let produtosCache = [];
+    let produtoSelecionado = null;
+
+    function mostrarPainel(painel) {
+      // Hide all panels
+      document.querySelectorAll('.admin-panel').forEach(el => el.classList.remove('active'));
+
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      // Show selected panel
+      document.getElementById(`painel-${painel}`).classList.add('active');
+      document.getElementById(`tab-${painel}`).classList.add('active');
+
+      currentPanel = painel;
+
+      // Load data for the panel
+      switch(painel) {
+        case 'listar':
+          carregarProdutosAdmin();
+          break;
+        case 'cadastrar':
+          limparFormulario();
+          break;
+        case 'atualizar':
+          prepararPainelAtualizar();
+          break;
+        case 'consultar':
+          prepararPainelConsultar();
+          break;
+        case 'dashboard':
+          carregarDashboard();
+          break;
+      }
+    }
+
+    // Load products for admin panel
+    async function carregarProdutosAdmin() {
+      const loading = document.getElementById('produtos-loading');
+      const error = document.getElementById('produtos-error');
+      const grid = document.getElementById('produtos-grid');
+
+      loading.style.display = 'block';
+      error.style.display = 'none';
+      grid.innerHTML = '';
+
+      try {
+        const response = await fetch(window.API_BASE_URL + '/produtos/admin', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const produtos = await response.json();
+          produtosCache = produtos;
+
+          loading.style.display = 'none';
+
+          if (produtos.length === 0) {
+            grid.innerHTML = '<div class="no-products-admin"><h3>Nenhum produto cadastrado</h3><p>Comece adicionando seu primeiro produto!</p></div>';
+            return;
+          }
+
+          produtos.forEach(produto => {
+            const card = criarCardProduto(produto);
+            grid.appendChild(card);
+          });
+
+          aplicarFiltros();
+        } else {
+          throw new Error('Erro ao carregar produtos');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = 'Erro ao carregar produtos. Verifique sua conexão.';
+      }
+    }
+
+    function criarCardProduto(produto) {
+      const card = document.createElement('div');
+      card.className = 'product-card-admin';
+      card.dataset.id = produto.codProduto;
+
+      const statusClass = produto.ativo ? 'status-active' : 'status-inactive';
+      const statusText = produto.ativo ? 'Ativo' : 'Inativo';
+      const precoFormatado = formatoPreco(produto.preco);
+      const estoque = produto.estoqueProduto?.quantidade_atual || 0;
+
+      card.innerHTML = `
+        <div class="product-image-admin">
+          <img src="${produto.imagem_url || '/frontend/images/placeholder-moto.svg'}"
+               alt="${produto.nome}"
+               onerror="this.src='/frontend/images/placeholder-moto.svg'">
+          <div class="product-status ${statusClass}">${statusText}</div>
+        </div>
+        <div class="product-info-admin">
+          <h3 class="product-name">${produto.nome}</h3>
+          <p class="product-model">${produto.modelo}</p>
+          <div class="product-details">
+            <span class="product-price">${precoFormatado}</span>
+            <span class="product-stock">Estoque: ${estoque}</span>
+          </div>
+          <p class="product-description">${produto.descricao || 'Sem descrição'}</p>
+        </div>
+        <div class="product-actions">
+          <button class="action-btn" onclick="selecionarProdutoParaConsultar(${produto.codProduto})">
+            👁️ Consultar
+          </button>
+          <button class="action-btn edit-btn" onclick="selecionarProdutoParaAtualizar(${produto.codProduto})">
+            ✏️ Atualizar
+          </button>
+          <button class="action-btn ${produto.ativo ? 'danger' : 'success'}"
+                  onclick="${produto.ativo ? 'desativarProduto' : 'ativarProduto'}(${produto.codProduto})">
+            ${produto.ativo ? '🚫 Desativar' : '✅ Ativar'}
+          </button>
+          <button class="action-btn danger" onclick="excluirProduto(${produto.codProduto})">
+            🗑️ Excluir
+          </button>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function filtrarProdutos() {
+      const searchTerm = document.getElementById('search-produto').value.toLowerCase();
+      const statusFilter = document.getElementById('filter-status').value;
+      const cards = document.querySelectorAll('.product-card-admin');
+
+      cards.forEach(card => {
+        const produto = produtosCache.find(p => p.codProduto == card.dataset.id);
+        if (!produto) return;
+
+        const matchesSearch = produto.nome.toLowerCase().includes(searchTerm) ||
+                             produto.modelo.toLowerCase().includes(searchTerm);
+        const matchesStatus = statusFilter === 'todos' ||
+                             (statusFilter === 'ativo' && produto.ativo) ||
+                             (statusFilter === 'inativo' && !produto.ativo);
+
+        card.style.display = (matchesSearch && matchesStatus) ? 'block' : 'none';
+      });
+    }
+
+    function limparFormulario() {
+      document.getElementById('form-produto').reset();
+      document.getElementById('produto-id').value = '';
+      document.getElementById('form-title').textContent = '➕ Cadastrar Novo Produto';
+      document.getElementById('ativo').checked = true;
+    }
+
+    function consultarProduto(id) {
+      const produto = produtosCache.find(p => p.codProduto == id);
+      if (!produto) return;
+
+      // Criar modal de consulta
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'block';
+
+      const precoFormatado = `R$ ${parseFloat(produto.preco).toFixed(2)}`;
+      const estoque = produto.estoqueProduto?.quantidade_atual || 0;
+      const statusText = produto.ativo ? 'Ativo' : 'Inativo';
+
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+          <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+          <h2 style="margin-bottom: 20px; color: #f8fafc;">📋 Detalhes do Produto</h2>
+
+          <div style="display: grid; gap: 15px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="${produto.imagem_url || '/frontend/images/placeholder-moto.svg'}"
+                   alt="${produto.nome}"
+                   style="max-width: 200px; height: auto; border-radius: 8px;"
+                   onerror="this.src='/frontend/images/placeholder-moto.svg'">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <strong style="color: #94a3b8;">Nome:</strong><br>
+                <span style="color: #f8fafc;">${produto.nome}</span>
+              </div>
+              <div>
+                <strong style="color: #94a3b8;">Modelo:</strong><br>
+                <span style="color: #f8fafc;">${produto.modelo}</span>
+              </div>
+              <div>
+                <strong style="color: #94a3b8;">Preço:</strong><br>
+                <span style="color: #ff6f00; font-weight: bold;">${precoFormatado}</span>
+              </div>
+              <div>
+                <strong style="color: #94a3b8;">Estoque:</strong><br>
+                <span style="color: #f8fafc;">${estoque} unidades</span>
+              </div>
+              <div>
+                <strong style="color: #94a3b8;">Status:</strong><br>
+                <span style="color: ${produto.ativo ? '#10b981' : '#ef4444'}; font-weight: bold;">${statusText}</span>
+              </div>
+              <div>
+                <strong style="color: #94a3b8;">Código:</strong><br>
+                <span style="color: #f8fafc;">${produto.codProduto}</span>
+              </div>
+            </div>
+
+            <div>
+              <strong style="color: #94a3b8;">Descrição:</strong><br>
+              <p style="color: #cbd5e1; margin: 5px 0; line-height: 1.5;">${produto.descricao || 'Sem descrição'}</p>
+            </div>
+
+            ${produto.imagem_url ? `
+            <div>
+              <strong style="color: #94a3b8;">URL da Imagem:</strong><br>
+              <a href="${produto.imagem_url}" target="_blank" style="color: #ff6f00; word-break: break-all;">${produto.imagem_url}</a>
+            </div>
+            ` : ''}
+          </div>
+
+          <div style="text-align: center; margin-top: 30px;">
+            <button class="action-btn" onclick="this.closest('.modal').remove()">Fechar</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      // Fechar modal ao clicar fora
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      });
+    }
+
+    function selecionarProdutoParaConsultar(id) {
+      produtoSelecionado = produtosCache.find(p => p.codProduto == id);
+      if (!produtoSelecionado) return;
+      mostrarPainel('consultar');
+    }
+
+    function selecionarProdutoParaAtualizar(id) {
+      produtoSelecionado = produtosCache.find(p => p.codProduto == id);
+      if (!produtoSelecionado) return;
+      mostrarPainel('atualizar');
+    }
+
+    function prepararPainelAtualizar() {
+      const loading = document.getElementById('atualizar-loading');
+      const content = document.getElementById('atualizar-content');
+
+      if (!produtoSelecionado) {
+        loading.textContent = 'Selecione um produto para editar...';
+        content.style.display = 'none';
+        loading.style.display = 'block';
+        return;
+      }
+
+      loading.style.display = 'none';
+      content.style.display = 'block';
+
+      // Preencher formulário
+      document.getElementById('atualizar-produto-id').value = produtoSelecionado.codProduto;
+      document.getElementById('atualizar-nome').value = produtoSelecionado.nome;
+      document.getElementById('atualizar-modelo').value = produtoSelecionado.modelo;
+      document.getElementById('atualizar-preco').value = produtoSelecionado.preco;
+      document.getElementById('atualizar-quantidade_estoque').value = produtoSelecionado.estoqueProduto?.quantidade_atual || 0;
+      document.getElementById('atualizar-imagem_url').value = produtoSelecionado.imagem_url || '';
+      document.getElementById('atualizar-descricao').value = produtoSelecionado.descricao || '';
+      document.getElementById('atualizar-ativo').checked = produtoSelecionado.ativo;
+    }
+
+    function prepararPainelConsultar() {
+      const loading = document.getElementById('consultar-loading');
+      const content = document.getElementById('consultar-content');
+      const detalhes = document.getElementById('produto-detalhes');
+
+      if (!produtoSelecionado) {
+        loading.textContent = 'Selecione um produto para consultar...';
+        content.style.display = 'none';
+        loading.style.display = 'block';
+        return;
+      }
+
+      loading.style.display = 'none';
+      content.style.display = 'block';
+
+      const precoFormatado = formatoPreco(produtoSelecionado.preco);
+      const estoque = produtoSelecionado.estoqueProduto?.quantidade_atual || 0;
+      const statusText = produtoSelecionado.ativo ? 'Ativo' : 'Inativo';
+
+      detalhes.innerHTML = `
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <img src="${produtoSelecionado.imagem_url || '/frontend/images/placeholder-moto.svg'}"
+               alt="${produtoSelecionado.nome}"
+               style="max-width: 250px; height: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+          <div style="background: #334155; padding: 1.5rem; border-radius: 8px;">
+            <h3 style="color: #ff6f00; margin: 0 0 1rem 0; font-size: 1.1rem;">Informações Básicas</h3>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Nome:</strong> ${produtoSelecionado.nome}</p>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Modelo:</strong> ${produtoSelecionado.modelo}</p>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Código:</strong> ${produtoSelecionado.codProduto}</p>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Status:</strong>
+              <span style="color: ${produtoSelecionado.ativo ? '#10b981' : '#ef4444'}; font-weight: bold;">${statusText}</span>
+            </p>
+          </div>
+
+          <div style="background: #334155; padding: 1.5rem; border-radius: 8px;">
+            <h3 style="color: #ff6f00; margin: 0 0 1rem 0; font-size: 1.1rem;">Dados Comerciais</h3>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Preço:</strong>
+              <span style="color: #ff6f00; font-weight: bold; font-size: 1.1rem;">${precoFormatado}</span>
+            </p>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Estoque:</strong> ${estoque} unidades</p>
+            <p style="margin: 0.5rem 0; color: #e2e8f0;"><strong>Valor em Estoque:</strong>
+              ${formatoPreco(parseFloat(produtoSelecionado.preco) * estoque)}
+            </p>
+          </div>
+        </div>
+
+        <div style="background: #334155; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+          <h3 style="color: #ff6f00; margin: 0 0 1rem 0; font-size: 1.1rem;">Descrição</h3>
+          <p style="color: #cbd5e1; line-height: 1.6; margin: 0;">${produtoSelecionado.descricao || 'Sem descrição disponível.'}</p>
+        </div>
+
+        ${produtoSelecionado.imagem_url ? `
+        <div style="background: #334155; padding: 1.5rem; border-radius: 8px;">
+          <h3 style="color: #ff6f00; margin: 0 0 1rem 0; font-size: 1.1rem;">Imagem</h3>
+          <p style="color: #cbd5e1; margin: 0 0 0.5rem 0; word-break: break-all;">
+            <strong>URL:</strong> ${produtoSelecionado.imagem_url}
+          </p>
+          <a href="${produtoSelecionado.imagem_url}" target="_blank" style="color: #ff6f00; text-decoration: none;">
+            🔗 Abrir imagem em nova aba
+          </a>
+        </div>
+        ` : ''}
+      `;
+    }
+
+    async function salvarProduto(event) {
+      event.preventDefault();
+
+      const produtoData = {
+        nome: document.getElementById('nome').value.trim(),
+        modelo: document.getElementById('modelo').value.trim(),
+        preco: parseFloat(document.getElementById('preco').value),
+        quantidade_estoque: parseInt(document.getElementById('quantidade_estoque').value),
+        imagem_url: document.getElementById('imagem_url').value.trim() || null,
+        descricao: document.getElementById('descricao').value.trim() || null,
+        ativo: document.getElementById('ativo').checked
+      };
+
+      // Validation
+      if (!produtoData.nome || !produtoData.modelo || !produtoData.preco || produtoData.quantidade_estoque < 0) {
+        alert('Preencha todos os campos obrigatórios corretamente!');
+        return;
+      }
+
+      try {
+        // Create new product (don't send 'ativo' as backend sets it to true)
+        const { ativo, ...createData } = produtoData;
+        const response = await fetch(window.API_BASE_URL + '/produtos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(createData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert('Produto criado com sucesso!');
+          limparFormulario();
+          mostrarPainel('listar');
+          carregarProdutosAdmin(); // Reload products
+        } else {
+          const error = await response.json();
+          alert('Erro: ' + (error.error || 'Erro ao criar produto'));
+        }
+      } catch (error) {
+        console.error('Erro ao criar produto:', error);
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+
+    async function atualizarProdutoExistente(event) {
+      event.preventDefault();
+
+      const produtoId = document.getElementById('atualizar-produto-id').value;
+      if (!produtoId) {
+        alert('Produto não selecionado!');
+        return;
+      }
+
+      const produtoData = {
+        nome: document.getElementById('atualizar-nome').value.trim(),
+        modelo: document.getElementById('atualizar-modelo').value.trim(),
+        preco: parseFloat(document.getElementById('atualizar-preco').value),
+        quantidade_estoque: parseInt(document.getElementById('atualizar-quantidade_estoque').value),
+        imagem_url: document.getElementById('atualizar-imagem_url').value.trim() || null,
+        descricao: document.getElementById('atualizar-descricao').value.trim() || null,
+        ativo: document.getElementById('atualizar-ativo').checked
+      };
+
+      // Validation
+      if (!produtoData.nome || !produtoData.modelo || !produtoData.preco || produtoData.quantidade_estoque < 0) {
+        alert('Preencha todos os campos obrigatórios corretamente!');
+        return;
+      }
+
+      try {
+        // Update existing product
+        const response = await fetch(window.API_BASE_URL + `/produtos/${produtoId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            nome: produtoData.nome,
+            modelo: produtoData.modelo,
+            preco: produtoData.preco,
+            imagem_url: produtoData.imagem_url,
+            descricao: produtoData.descricao,
+            ativo: produtoData.ativo
+          })
+        });
+
+        // Update stock separately
+        if (response.ok) {
+          await fetch(window.API_BASE_URL + `/produtos/${produtoId}/estoque`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ quantidade: produtoData.quantidade_estoque })
+          });
+        }
+
+        if (response.ok) {
+          alert('Produto atualizado com sucesso!');
+          produtoSelecionado = null;
+          mostrarPainel('listar');
+          carregarProdutosAdmin(); // Reload products
+        } else {
+          const error = await response.json();
+          alert('Erro: ' + (error.error || 'Erro ao atualizar produto'));
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar produto:', error);
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+
+    async function desativarProduto(id) {
+      if (!confirm('Tem certeza que deseja desativar este produto? Ele não aparecerá mais na loja.')) return;
+
+      try {
+        const response = await fetch(window.API_BASE_URL + `/produtos/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ ativo: false })
+        });
+
+        if (response.ok) {
+          alert('Produto desativado com sucesso!');
+          carregarProdutosAdmin();
+        } else {
+          alert('Erro ao desativar produto');
+        }
+      } catch (error) {
+        console.error('Erro ao desativar produto:', error);
+        alert('Erro de conexão');
+      }
+    }
+
+    async function ativarProduto(id) {
+      try {
+        const response = await fetch(window.API_BASE_URL + `/produtos/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ ativo: true })
+        });
+
+        if (response.ok) {
+          alert('Produto ativado com sucesso!');
+          carregarProdutosAdmin();
+        } else {
+          alert('Erro ao ativar produto');
+        }
+      } catch (error) {
+        console.error('Erro ao ativar produto:', error);
+        alert('Erro de conexão');
+      }
+    }
+
+    async function excluirProduto(id) {
+      if (!confirm('ATENÇÃO: Esta ação não pode ser desfeita! Tem certeza que deseja excluir permanentemente este produto?')) return;
+
+      try {
+        const response = await fetch(window.API_BASE_URL + `/produtos/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          alert('Produto excluído com sucesso!');
+          carregarProdutosAdmin();
+        } else {
+          alert('Erro ao excluir produto');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir produto:', error);
+        alert('Erro de conexão');
+      }
+    }
+
+    async function carregarDashboard() {
+      try {
+        const response = await fetch(window.API_BASE_URL + '/produtos');
+
+        if (response.ok) {
+          const produtos = await response.json();
+
+          let totalProdutos = produtos.length;
+          let produtosAtivos = produtos.filter(p => p.ativo).length;
+          let valorTotal = produtos.reduce((sum, p) => sum + (parseFloat(p.preco) * (p.estoqueProduto?.quantidade_atual || 0)), 0);
+          let produtosSemEstoque = produtos.filter(p => (p.estoqueProduto?.quantidade_atual || 0) === 0).length;
+
+          document.getElementById('total-produtos').textContent = totalProdutos;
+          document.getElementById('produtos-ativos').textContent = produtosAtivos;
+          document.getElementById('valor-estoque').textContent = formatoPreco(valorTotal);
+          document.getElementById('produtos-sem-estoque').textContent = produtosSemEstoque;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dashboard:', error);
+      }
+    }
+
+    // Form submission handlers
+    document.getElementById('form-produto').addEventListener('submit', salvarProduto);
+    document.getElementById('form-atualizar').addEventListener('submit', atualizarProdutoExistente);
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      mostrarPainel('listar');
+    });
+  </script>
+</body>
+</html>

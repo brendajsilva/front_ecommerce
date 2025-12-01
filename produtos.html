@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Motos - Performance Motorizada</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo">Performance Motorizada</div>
+      <nav class="main-nav">
+        <a href="inicio.html">Início</a>
+        <a href="produtos.html" class="active">Motos</a>
+        <a href="quemsomos.html">Quem Somos</a>
+        <a href="contato.html">Contato</a>
+      </nav>
+      <div class="header-right">
+        <div class="search-wrap">
+          <input placeholder="Buscar motos, acessórios..." class="search-input" />
+        </div>
+        <div class="cart-icon" onclick="window.location.href='carrinho.html'"><span id="cart-count">0</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="products-hero">
+      <div class="hero-row">
+        <div>
+          <h1>Coleção Exclusiva de Motos</h1>
+          <p class="section-subtitle">Modelos esportivos e de luxo selecionados para performance e estilo.</p>
+        </div>
+        <div class="filters">
+          <select id="filter-category" aria-label="Filtrar por categoria">
+            <option value="all">Todas</option>
+            <option value="esportiva">Esportiva</option>
+            <option value="touring">Touring</option>
+          </select>
+          <select id="sort-by" aria-label="Ordenar por">
+            <option value="popular">Mais populares</option>
+            <option value="price-desc">Preço: Maior</option>
+            <option value="price-asc">Preço: Menor</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-list">
+      <div id="loading-spinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+        <p>Carregando produtos...</p>
+      </div>
+      <div id="lista-produtos" class="produtos-grid">
+        <!-- Products will be loaded dynamically -->
+      </div>
+      <div id="no-products" class="no-products" style="display: none;">
+        <h3>Nenhum produto encontrado</h3>
+        <p>Tente ajustar os filtros de busca.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="./script.js"></script>
+  <script src="./init.js"></script>
+</body>
+</html>

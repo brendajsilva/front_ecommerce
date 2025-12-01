@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Suporte | Performance Motorizada</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Professional styling for suporte page */
+    body {
+      background-color: #121620;
+      color: #e0e7ff;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+    }
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem 1rem;
+    }
+    header {
+      background-color: #1e293b;
+      padding: 1rem 0;
+    }
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1rem;
+      max-width: 1100px;
+      margin: auto;
+    }
+    .logo {
+      font-weight: 700;
+      color: #ff6f00;
+      font-size: 1.5rem;
+    }
+    nav a {
+      color: #bbbbbb;
+      margin: 0 0.75rem;
+      text-decoration: none;
+      font-weight: 500;
+      padding-bottom: 0.25rem;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+    nav a.active,
+    nav a:hover {
+      color: #ff6f00;
+      border-color: #ff6f00;
+    }
+    main h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #a5b4fc;
+    }
+    .support-cards-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+    }
+    .support-card {
+      background-color: #283046;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(10, 20, 40, 0.6);
+      width: 260px;
+      padding: 1.5rem;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .support-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(255, 111, 0, 0.5);
+    }
+    .support-card h3 {
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+      color: #ff6f00;
+    }
+    .support-card p {
+      flex-grow: 1;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .btn-secondary {
+      background-color: #ff6f00;
+      border: none;
+      padding: 0.6rem 1.3rem;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #121212;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-secondary:hover {
+      background-color: #e05e00;
+    }
+    .faq-section {
+      background-color: #283046;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(10, 20, 40, 0.6);
+      max-width: 850px;
+      margin: auto;
+    }
+    .faq-section h2 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #a5b4fc;
+      text-align: center;
+    }
+    .faq-item {
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #3b4256;
+      padding-bottom: 0.75rem;
+    }
+    .faq-item h3 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+    .faq-item p {
+      font-size: 1rem;
+      color: #d1d5db;
+      margin: 0;
+    }
+    @media (max-width: 768px) {
+      .support-cards-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+      .support-card {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">Performance Motorizada</div>
+      <nav>
+        <a href="login.html">Início</a>
+        <a href="produtos.html">Motos</a>
+        <a href="quemsomos.html">Quem Somos</a>
+        <a href="contato.html">Contato</a>
+        <a href="suporte.html" class="active">Suporte</a>
+        <a href="perfil.html">Perfil</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <h1>Central de Suporte</h1>
+    <section class="support-cards-grid" aria-label="Áreas de Suporte">
+      <article class="support-card">
+        <h3>📦 Rastreamento de Pedidos</h3>
+        <p>Acompanhe seu pedido em tempo real com atualizações constantes.</p>
+        <a href="perfil.html" class="btn-secondary">Ver Pedidos</a>
+      </article>
+      <article class="support-card">
+        <h3>🔄 Trocas e Devoluções</h3>
+        <p>Suporte para política de troca e devolução de produtos.</p>
+        <a href="contato.html" class="btn-secondary">Falar com Suporte</a>
+      </article>
+      <article class="support-card">
+        <h3>💳 Problemas de Pagamento</h3>
+        <p>Dúvidas e solução em problemas financeiros.</p>
+        <a href="contato.html" class="btn-secondary">Suporte Financeiro</a>
+      </article>
+      <article class="support-card">
+        <h3>🛠️ Assistência Técnica</h3>
+        <p>Ajuda especializada em instalação, manutenção e reparos.</p>
+        <a href="contato.html" class="btn-secondary">Falar com Técnico</a>
+      </article>
+    </section>
+    <section class="faq-section" aria-label="Perguntas Frequentes">
+      <h2>Perguntas Frequentes</h2>
+      <div class="faq-item">
+        <h3>Quanto tempo leva para entregar?</h3>
+        <p>Entregamos em até 7 dias úteis para capitais e 15 dias para outras regiões.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Posso trocar meu produto?</h3>
+        <p>Sim, aceitamos trocas em até 30 dias com nota fiscal e produto em perfeito estado.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Como funciona o frete?</h3>
+        <p>Frete grátis para compras acima de R$ 299. Para valores menores, o custo é calculado automaticamente.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Quais formas de pagamento?</h3>
+        <p>Aceitamos cartões de crédito, débito, PIX, boleto e transferência bancária.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
