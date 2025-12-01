@@ -1,6 +1,3 @@
-// Refactored frontend script to use local static product data, localStorage for cart and user management
-// Removes dependence on backend API to prevent 404 errors and allow full frontend functionality
-
 const localProducts = [
     {
         id: 1,
@@ -502,7 +499,7 @@ async function cadastrarAPI(event) {
         localStorage.setItem('user', JSON.stringify(userLogado));
         localStorage.setItem('token', data.token);
         mostrarMensagem(`Cadastro realizado com sucesso. Bem vindo, ${username}!`);
-        setTimeout(() => window.location.href = 'frontend/inicio.html', 1500);
+        setTimeout(() => window.location.href = './inicio.html', 1500);
     } catch (error) {
         console.error('Erro no cadastro:', error);
         mostrarMensagem(error.message || 'Erro ao cadastrar', 'error');
