@@ -442,7 +442,7 @@ async function login(event) {
         mostrarMensagem(`Bem vindo, ${usuario}!`);
 
         // Check if user is admin and redirect accordingly
-        const redirectUrl = data.usuario.tipo === 'ADMIN' ? 'frontend/admin.html' : 'frontend/inicio.html';
+        const redirectUrl = data.usuario.tipo === 'ADMIN' ? './admin.html' : './inicio.html';
         console.log('Login successful, redirecting to:', redirectUrl);
         setTimeout(() => {
             console.log('Executing redirect...');
@@ -499,7 +499,7 @@ async function cadastrarAPI(event) {
         localStorage.setItem('user', JSON.stringify(userLogado));
         localStorage.setItem('token', data.token);
         mostrarMensagem(`Cadastro realizado com sucesso. Bem vindo, ${username}!`);
-        setTimeout(() => window.location.href = '/inicio.html', 1500);
+        setTimeout(() => window.location.href = './inicio.html', 1500);
     } catch (error) {
         console.error('Erro no cadastro:', error);
         mostrarMensagem(error.message || 'Erro ao cadastrar', 'error');
