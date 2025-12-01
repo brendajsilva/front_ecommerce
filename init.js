@@ -10,62 +10,62 @@ function atualizarContadorCarrinho() {
 }
 
 const produtosDestaque = [
-  {
-    id: 1,
-    nome: 'BMW S1000RR',
-    preco: 82000.0,
-    imagem: './images/bmws1000rr.png',
-    destaque: true,
-    descricao: 'Superbike alemã com motor 4 cilindros em linha de 999cc, 207 HP e 113 Nm de torque. Equipada com ABS, controle de tração, quickshifter e suspensão ajustável. Peso: 197kg.',
-    categoria: 'Esportiva',
-    potencia: 207,
-    disponivel: true
-  },
-  {
-    id: 2,
-    nome: 'Ducati Diavel V4',
-    preco: 95000.0,
-    imagem: './images/DucatiDiavel.png',
-    destaque: true,
-    descricao: 'Power cruiser italiana com motor V4 Granturismo de 1158cc, 168 HP e 127 Nm de torque. Design agressivo, suspensão ajustável e freios Brembo. Peso: 218kg.',
-    categoria: 'Custom',
-    potencia: 168,
-    disponivel: true
-  },
-  {
-    id: 3,
-    nome: 'Ducati Panigale V4S',
-    preco: 125000.0,
-    imagem: './images/ducativ4s.png',
-    destaque: true,
-    descricao: 'Superbike italiana com motor V4 de 1103cc, 214 HP e 124 Nm de torque. Equipada com winglets aerodinâmicos, Öhlins ajustável e quickshifter. Peso: 198kg.',
-    categoria: 'Esportiva',
-    potencia: 214,
-    disponivel: true
-  },
-  {
-    id: 4,
-    nome: 'Kawasaki Ninja H2R',
-    preco: 135000.0,
-    imagem: './images/h2r.png',
-    destaque: true,
-    descricao: 'Hyperbike japonesa com motor 4 cilindros supercharged de 998cc, 310 HP e 165 Nm de torque. Aceleração de 0-100km/h em 2.5s. Peso: 216kg.',
-    categoria: 'Esportiva',
-    potencia: 310,
-    disponivel: true
-  },
-  {
-    id: 5,
-    nome: 'Kawasaki Z1000',
-    preco: 78000.0,
-    imagem: './images/z1000.png',
-    destaque: true,
-    descricao: 'Naked sport japonesa com motor 4 cilindros em linha de 1043cc, 142 HP e 111 Nm de torque. Equipada com ABS, controle de tração e quickshifter. Peso: 221kg.',
-    categoria: 'Naked',
-    potencia: 142,
-    disponivel: true
-  }
-];
+   {
+     id: 1,
+     nome: 'BMW S1000RR',
+     preco: 82000.0,
+     imagem: '/images/bmws1000rr.png',
+     destaque: true,
+     descricao: 'Superbike alemã com motor 4 cilindros em linha de 999cc, 207 HP e 113 Nm de torque. Equipada com ABS, controle de tração, quickshifter e suspensão ajustável. Peso: 197kg.',
+     categoria: 'Esportiva',
+     potencia: 207,
+     disponivel: true
+   },
+   {
+     id: 2,
+     nome: 'Ducati Diavel V4',
+     preco: 95000.0,
+     imagem: '/images/DucatiDiavel.png',
+     destaque: true,
+     descricao: 'Power cruiser italiana com motor V4 Granturismo de 1158cc, 168 HP e 127 Nm de torque. Design agressivo, suspensão ajustável e freios Brembo. Peso: 218kg.',
+     categoria: 'Custom',
+     potencia: 168,
+     disponivel: true
+   },
+   {
+     id: 3,
+     nome: 'Ducati Panigale V4S',
+     preco: 125000.0,
+     imagem: '/images/ducativ4s.png',
+     destaque: true,
+     descricao: 'Superbike italiana com motor V4 de 1103cc, 214 HP e 124 Nm de torque. Equipada com winglets aerodinâmicos, Öhlins ajustável e quickshifter. Peso: 198kg.',
+     categoria: 'Esportiva',
+     potencia: 214,
+     disponivel: true
+   },
+   {
+     id: 4,
+     nome: 'Kawasaki Ninja H2R',
+     preco: 135000.0,
+     imagem: '/images/h2r.png',
+     destaque: true,
+     descricao: 'Hyperbike japonesa com motor 4 cilindros supercharged de 998cc, 310 HP e 165 Nm de torque. Aceleração de 0-100km/h em 2.5s. Peso: 216kg.',
+     categoria: 'Esportiva',
+     potencia: 310,
+     disponivel: true
+   },
+   {
+     id: 5,
+     nome: 'Kawasaki Z1000',
+     preco: 78000.0,
+     imagem: '/images/z1000.png',
+     destaque: true,
+     descricao: 'Naked sport japonesa com motor 4 cilindros em linha de 1043cc, 142 HP e 111 Nm de torque. Equipada com ABS, controle de tração e quickshifter. Peso: 221kg.',
+     categoria: 'Naked',
+     potencia: 142,
+     disponivel: true
+   }
+ ];
 
 function formatoPreco(valor) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -91,7 +91,7 @@ async function fetchProductsAPI() {
       id: p.codProduto || p.id || 0,
       nome: p.nome || 'Produto',
       preco: parseFloat(p.preco || 0),
-      imagem: p.imagem_url || './images/placeholder-moto.svg',
+      imagem: (p.imagem_url || '/images/placeholder-moto.svg').replace('/frontend/images', '/images'),
       descricao: p.descricao || '',
       categoria: p.categoria || 'Esportiva',
       potencia: p.potencia || null,
@@ -114,8 +114,8 @@ function handleImageError(imgEl) {
     placeholder.appendChild(span);
     imgEl.replaceWith(placeholder);
   } catch (e) {
-  // se algo falhar, tenta trocar a src para o placeholder local
-  try { imgEl.src = './images/placeholder-moto.svg'; } catch (_) {}
+    // se algo falhar, tenta trocar a src para o placeholder local
+    try { imgEl.src = '/images/placeholder-moto.svg'; } catch (_) { }
   }
 }
 
@@ -126,60 +126,60 @@ async function renderizarProdutosDestaque() {
   const containers = [document.getElementById('produtos-destaque'), document.getElementById('lista-produtos')].filter(Boolean);
   containers.forEach(container => {
     container.innerHTML = '';
-      lista.forEach(prod => {
+    lista.forEach(prod => {
 
-        // Estrutura do card flip: .produto.flip-card > .flip-card-inner > .flip-card-front / .flip-card-back
-        const card = document.createElement('div');
-        card.className = 'produto flip-card';
+      // Estrutura do card flip: .produto.flip-card > .flip-card-inner > .flip-card-front / .flip-card-back
+      const card = document.createElement('div');
+      card.className = 'produto flip-card';
 
-        const inner = document.createElement('div');
-        inner.className = 'flip-card-inner';
+      const inner = document.createElement('div');
+      inner.className = 'flip-card-inner';
 
-        // Frente
-        const front = document.createElement('div');
-        front.className = 'flip-card-front';
+      // Frente
+      const front = document.createElement('div');
+      front.className = 'flip-card-front';
 
-        const imgWrap = document.createElement('div');
-        imgWrap.className = 'card-image';
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'card-image';
 
-        // price tag overlay (ribbon)
-        const priceTag = document.createElement('div');
-        priceTag.className = 'price-tag';
-        priceTag.textContent = formatoPreco(prod.preco);
-        imgWrap.appendChild(priceTag);
+      // price tag overlay (ribbon)
+      const priceTag = document.createElement('div');
+      priceTag.className = 'price-tag';
+      priceTag.textContent = formatoPreco(prod.preco);
+      imgWrap.appendChild(priceTag);
 
-        const imgEl = document.createElement('img');
-        imgEl.alt = prod.nome || 'produto';
-        try {
-          const imgPath = (typeof prod.imagem === 'string') ? prod.imagem.trim() : '';
-          if (!imgPath) {
-            imgEl.src = window.location.origin + './images/placeholder-moto.svg';
-          } else if (/^https?:\/\//i.test(imgPath)) {
-            imgEl.src = imgPath;
-          } else if (imgPath.startsWith('/')) {
-            imgEl.src = window.location.origin + imgPath;
-          } else {
-            const cleaned = imgPath.replace(/^\/+/, '');
-            imgEl.src = window.location.origin + '/' + cleaned;
-          }
-        } catch (e) {
-          console.error('Erro ao configurar imagem do produto', prod.nome, e);
-          imgEl.src = window.location.origin + './images/placeholder-moto.svg';
+      const imgEl = document.createElement('img');
+      imgEl.alt = prod.nome || 'produto';
+      // Dentro de renderizarProdutosDestaque
+      try {
+        const imgPath = (typeof prod.imagem === 'string') ? prod.imagem.trim() : '';
+
+        if (!imgPath) {
+          // Se não houver caminho, usa o placeholder relativo
+          imgEl.src = '/images/placeholder-moto.svg';
+        } else {
+          // Usa o caminho diretamente (seja ele http://... ou /images/...)
+          // Isso permite que o navegador resolva o caminho relativo corretamente
+          imgEl.src = imgPath;
         }
-        imgEl.onerror = function() { handleImageError(this); };
-        imgWrap.appendChild(imgEl);
+      } catch (e) {
+        console.error('Erro ao configurar imagem do produto', prod.nome, e);
+        imgEl.src = '/images/placeholder-moto.svg';
+      }
+      imgEl.onerror = function () { handleImageError(this); };
+      imgWrap.appendChild(imgEl);
 
-        const body = document.createElement('div');
-        body.className = 'card-body';
-        body.innerHTML = `<h3>${prod.nome}</h3><p class="descricao">${prod.descricao}</p>`;
+      const body = document.createElement('div');
+      body.className = 'card-body';
+      body.innerHTML = `<h3>${prod.nome}</h3><p class="descricao">${prod.descricao}</p>`;
 
-        front.appendChild(imgWrap);
-        front.appendChild(body);
+      front.appendChild(imgWrap);
+      front.appendChild(body);
 
-        // Verso do card
-        const back = document.createElement('div');
-        back.className = 'flip-card-back';
-        back.innerHTML = `
+      // Verso do card
+      const back = document.createElement('div');
+      back.className = 'flip-card-back';
+      back.innerHTML = `
           <div class="back-content">
             <h3>${prod.nome}</h3>
             <p class="descricao">${prod.descricao}</p>
@@ -194,22 +194,22 @@ async function renderizarProdutosDestaque() {
           </div>
         `;
 
-        // evento do botão no verso
-        back.querySelector('.add-cart').onclick = function(e) { e.stopPropagation(); adicionarAoCarrinho({ id: prod.id, nome: prod.nome, preco: prod.preco }); atualizarContadorCarrinho(); };
+      // evento do botão no verso
+      back.querySelector('.add-cart').onclick = function (e) { e.stopPropagation(); adicionarAoCarrinho({ id: prod.id, nome: prod.nome, preco: prod.preco }); atualizarContadorCarrinho(); };
 
-        inner.appendChild(front);
-        inner.appendChild(back);
-        card.appendChild(inner);
+      inner.appendChild(front);
+      inner.appendChild(back);
+      card.appendChild(inner);
 
-        // tornar acessível por toque: alterna a classe is-flipped em dispositivos sem hover
-        card.addEventListener('click', function(e) {
-          if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
-            this.classList.toggle('is-flipped');
-          }
-        });
-
-        container.appendChild(card);
+      // tornar acessível por toque: alterna a classe is-flipped em dispositivos sem hover
+      card.addEventListener('click', function (e) {
+        if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+          this.classList.toggle('is-flipped');
+        }
       });
+
+      container.appendChild(card);
+    });
   });
 }
 
@@ -234,7 +234,7 @@ function renderizarProdutosIndex() {
       const imgEl = document.createElement('img');
       imgEl.alt = prod.nome || 'produto';
       imgEl.src = prod.imagem;
-      imgEl.onerror = function() { handleImageError(this); };
+      imgEl.onerror = function () { handleImageError(this); };
       imgWrap.appendChild(imgEl);
 
       const body = document.createElement('div');
@@ -246,7 +246,7 @@ function renderizarProdutosIndex() {
       footer.innerHTML = `<span class="preco">${formatoPreco(prod.preco)}</span>`;
       const btn = document.createElement('button');
       btn.textContent = 'Adicionar ao Carrinho';
-      btn.onclick = function() { adicionarAoCarrinho({ id: prod.id, nome: prod.nome, preco: prod.preco }); atualizarContadorCarrinho(); };
+      btn.onclick = function () { adicionarAoCarrinho({ id: prod.id, nome: prod.nome, preco: prod.preco }); atualizarContadorCarrinho(); };
       footer.appendChild(btn);
 
       div.appendChild(imgWrap);
@@ -379,22 +379,20 @@ function renderizarProdutosFiltrados() {
 
     const imgEl = document.createElement('img');
     imgEl.alt = prod.nome || 'Produto';
+    // Dentro de renderizarProdutosFiltrados
     try {
       const imgPath = (typeof prod.imagem === 'string') ? prod.imagem.trim() : '';
+
       if (!imgPath) {
-        imgEl.src = window.location.origin + './images/placeholder-moto.svg';
-      } else if (/^https?:\/\//i.test(imgPath)) {
-        imgEl.src = imgPath;
-      } else if (imgPath.startsWith('/')) {
-        imgEl.src = window.location.origin + imgPath;
+        imgEl.src = '/images/placeholder-moto.svg';
       } else {
-        const cleaned = imgPath.replace(/^\/+/, '');
-        imgEl.src = window.location.origin + '/' + cleaned;
+        // Simplificado: atribui o caminho direto, sem tentar adivinhar a origem
+        imgEl.src = imgPath;
       }
     } catch (e) {
-      imgEl.src = window.location.origin + './images/placeholder-moto.svg';
+      imgEl.src = '/images/placeholder-moto.svg';
     }
-    imgEl.onerror = function() { handleImageError(this); };
+    imgEl.onerror = function () { handleImageError(this); };
     imgWrap.appendChild(imgEl);
 
     const body = document.createElement('div');
@@ -428,7 +426,7 @@ function renderizarProdutosFiltrados() {
     card.appendChild(inner);
 
     // Mobile tap support
-    card.addEventListener('click', function(e) {
+    card.addEventListener('click', function (e) {
       if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
         this.classList.toggle('is-flipped');
       }
