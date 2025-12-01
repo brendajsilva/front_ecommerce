@@ -499,7 +499,7 @@ async function cadastrarAPI(event) {
         localStorage.setItem('user', JSON.stringify(userLogado));
         localStorage.setItem('token', data.token);
         mostrarMensagem(`Cadastro realizado com sucesso. Bem vindo, ${username}!`);
-        setTimeout(() => window.location.href = './inicio.html', 1500);
+        setTimeout(() => window.location.href = '/inicio.html', 1500);
     } catch (error) {
         console.error('Erro no cadastro:', error);
         mostrarMensagem(error.message || 'Erro ao cadastrar', 'error');
@@ -511,7 +511,7 @@ function logout() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     userLogado = null;
-    window.location.href = '/';  // redirect to login page
+    window.location.href = '/';  
 }
 
 function finalizarCompra() {
