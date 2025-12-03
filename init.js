@@ -1,7 +1,7 @@
 // Inicialização do frontend: contador do carrinho e produtos em destaque
 
 // Configurar URL da API
-window.API_BASE_URL = 'http://localhost:3000/api';
+window.API_BASE_URL = 'https://ecommerce-production-ce37.up.railway.app/api';
 
 function atualizarContadorCarrinho() {
   const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
