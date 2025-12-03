@@ -1,863 +1,793 @@
-const localProducts = [
-    {
-        id: 1,
-        nome: 'BMW S1000RR',
-        preco: 82000.0,
-        imagem: '/images/bmws1000rr.png',
-        destaque: true,
-        descricao: 'Superbike alemã com motor 4 cilindros em linha de 999cc, 207 HP e 113 Nm de torque. Equipada com ABS, controle de tração, quickshifter e suspensão ajustável. Peso: 197kg.',
-        categoria: 'Esportiva',
-        potencia: 207,
-        disponivel: true
-    },
-    {
-        id: 2,
-        nome: 'Ducati Diavel V4',
-        preco: 95000.0,
-        imagem: '/images/DucatiDiavel.png',
-        destaque: true,
-        descricao: 'Power cruiser italiana com motor V4 Granturismo de 1158cc, 168 HP e 127 Nm de torque. Design agressivo, suspensão ajustável e freios Brembo. Peso: 218kg.',
-        categoria: 'Custom',
-        potencia: 168,
-        disponivel: true
-    },
-    {
-        id: 3,
-        nome: 'Ducati Panigale V4S',
-        preco: 125000.0,
-        imagem: '/images/ducativ4s.png',
-        destaque: true,
-        descricao: 'Superbike italiana com motor V4 de 1103cc, 214 HP e 124 Nm de torque. Equipada com winglets aerodinâmicos, Öhlins ajustável e quickshifter. Peso: 198kg.',
-        categoria: 'Esportiva',
-        potencia: 214,
-        disponivel: true
-    },
-    {
-        id: 4,
-        nome: 'Kawasaki Ninja H2R',
-        preco: 135000.0,
-        imagem: '/images/h2r.png',
-        destaque: true,
-        descricao: 'Hyperbike japonesa com motor 4 cilindros supercharged de 998cc, 310 HP e 165 Nm de torque. Aceleração de 0-100km/h em 2.5s. Peso: 216kg.',
-        categoria: 'Esportiva',
-        potencia: 310,
-        disponivel: true
-    },
-    {
-        id: 5,
-        nome: 'Kawasaki Z1000',
-        preco: 78000.0,
-        imagem: '/images/z1000.png',
-        destaque: true,
-        descricao: 'Naked sport japonesa com motor 4 cilindros em linha de 1043cc, 142 HP e 111 Nm de torque. Equipada com ABS, controle de tração e quickshifter. Peso: 221kg.',
-        categoria: 'Naked',
-        potencia: 142,
-        disponivel: true
-    }
-];
+// script.js - lógica da aplicação (carrinho, login, cadastro, checkout, endereços)
+// Requer que window.API_BASE_URL e fetchProductsAPI() existam (definidos em init.js)
 
+// --- Configurações iniciais e estados ---
 let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 let userLogado = JSON.parse(localStorage.getItem('userLogado')) || null;
 
-// Função para formatar CPF
-function formatarCPF(input) {
-    let value = input.value.replace(/\D/g, ''); // Remove tudo que não é dígito
-    if (value.length <= 11) {
-        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    }
-    input.value = value;
+// Produto cache local (apenas fallback caso a API não responda)
+const produtosFallback = [
+  {
+    id: 1,
+    nome: 'BMW S1000RR',
+    preco: 82000.0,
+    imagem: '/images/bmws1000rr.png',
+    descricao: 'Superbike alemã com motor 4 cilindros...',
+    categoria: 'Esportiva',
+    potencia: 207,
+    disponivel: true
+  },
+  {
+    id: 2,
+    nome: 'Ducati Diavel V4',
+    preco: 95000.0,
+    imagem: '/images/DucatiDiavel.png',
+    descricao: 'Power cruiser italiana...',
+    categoria: 'Custom',
+    potencia: 168,
+    disponivel: true
+  },
+  {
+    id: 3,
+    nome: 'Ducati Panigale V4S',
+    preco: 125000.0,
+    imagem: '/images/ducativ4s.png',
+    descricao: 'Superbike italiana...',
+    categoria: 'Esportiva',
+    potencia: 214,
+    disponivel: true
+  },
+  {
+    id: 4,
+    nome: 'Kawasaki Ninja H2R',
+    preco: 135000.0,
+    imagem: '/images/h2r.png',
+    descricao: 'Hyperbike japonesa...',
+    categoria: 'Esportiva',
+    potencia: 310,
+    disponivel: true
+  },
+  {
+    id: 5,
+    nome: 'Kawasaki Z1000',
+    preco: 78000.0,
+    imagem: '/images/z1000.png',
+    descricao: 'Naked sport japonesa...',
+    categoria: 'Naked',
+    potencia: 142,
+    disponivel: true
+  }
+];
+
+// --- Utilitários ---
+function mostrarMensagem(mensagem, tipo = 'success', duracao = 3000) {
+  // tipo: 'success' | 'error' | 'info'
+  const prev = document.getElementById("mensagem-global");
+  if (prev) prev.remove();
+
+  const el = document.createElement("div");
+  el.id = "mensagem-global";
+  el.className = `toast ${tipo}`;
+  el.textContent = mensagem;
+  Object.assign(el.style, {
+    position: "fixed",
+    top: "20px",
+    right: "20px",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    color: "#fff",
+    zIndex: 9999,
+    fontWeight: 600,
+    background: tipo === 'success' ? '#28a745' : tipo === 'error' ? '#dc3545' : '#007bff',
+  });
+
+  document.body.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, duracao);
 }
 
-// Função para validar CPF
-function validarCPF(cpf) {
-    cpf = cpf.replace(/\D/g, ''); // Remove não-dígitos
-
-    if (cpf.length !== 11) return false;
-
-    // Verifica se todos os dígitos são iguais
-    if (/^(\d)\1+$/.test(cpf)) return false;
-
-    // Calcula primeiro dígito verificador
-    let soma = 0;
-    for (let i = 0; i < 9; i++) {
-        soma += parseInt(cpf[i]) * (10 - i);
-    }
-    let resto = (soma * 10) % 11;
-    if (resto === 10) resto = 0;
-    if (resto !== parseInt(cpf[9])) return false;
-
-    // Calcula segundo dígito verificador
-    soma = 0;
-    for (let i = 0; i < 10; i++) {
-        soma += parseInt(cpf[i]) * (11 - i);
-    }
-    resto = (soma * 10) % 11;
-    if (resto === 10) resto = 0;
-    if (resto !== parseInt(cpf[10])) return false;
-
-    return true;
+function formatoPrecoBR(valor) {
+  return (Number(valor) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Função para validar RG (identidade) - validação básica
-function validarRG(rg) {
-    rg = rg.replace(/\D/g, ''); // Remove não-dígitos
-    // RG deve ter pelo menos 7 dígitos (pode variar por estado)
-    return rg.length >= 7 && rg.length <= 12 && !/^(\d)\1+$/.test(rg);
+// Atualiza contador de carrinho (pega do localStorage)
+function atualizarContadorCarrinho() {
+  carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+  const countEl = document.getElementById('cart-count');
+  if (countEl) countEl.textContent = carrinho.length;
 }
 
-function atualizarCarrinho() {
-    const count = document.getElementById("cart-count");
-    if (count) {
-        count.textContent = carrinho.length;
+// Busca produto por id nos produtos obtidos da API ou fallback
+async function buscarProdutoPorId(id) {
+  try {
+    // Tenta usar fetchProductsAPI() se existir (de init.js)
+    if (typeof fetchProductsAPI === 'function') {
+      const produtos = await fetchProductsAPI();
+      const p = produtos.find(x => Number(x.id) === Number(id));
+      if (p) return p;
     }
+  } catch (e) {
+    console.warn('Erro ao buscar via fetchProductsAPI:', e && e.message);
+  }
+
+  // fallback local
+  return produtosFallback.find(x => Number(x.id) === Number(id)) || null;
 }
 
-function mostrarMensagem(mensagem, tipo='success') {
-    const prev = document.getElementById("mensagem-global");
-    if (prev) prev.remove();
-
-    const el = document.createElement("div");
-    el.id = "mensagem-global";
-    el.className = `toast ${tipo}`;
-    el.textContent = mensagem;
-    Object.assign(el.style, {
-        position: "fixed",
-        top: "20px",
-        right: "20px",
-        padding: "12px 16px",
-        borderRadius: "8px",
-        color: "#fff",
-        zIndex: 9999,
-        fontWeight: 600,
-        background: tipo === 'success' ? '#28a745' : tipo === 'error' ? '#dc3545' : '#007bff',
-    });
-
-    document.body.appendChild(el);
-    setTimeout(() => { if (el.parentNode) el.remove(); }, 3000);
+// --- Funções do carrinho ---
+function salvarCarrinhoLocal() {
+  localStorage.setItem('carrinho', JSON.stringify(carrinho));
+  atualizarContadorCarrinho();
 }
 
 function adicionarAoCarrinho(produtoId) {
-    if (!verificarAutenticacao()) return;
+  // produtoId pode ser inteiro ou objeto
+  (async () => {
+    try {
+      let produtoObj = null;
 
-    const produto = localProducts.find(p => p.id === produtoId);
-    if (!produto) {
-        mostrarMensagem("Produto não encontrado", "error");
+      if (typeof produtoId === 'object' && produtoId !== null) {
+        // já é um objeto produto
+        produtoObj = produtoId;
+      } else {
+        produtoObj = await buscarProdutoPorId(produtoId);
+      }
+
+      if (!produtoObj) {
+        mostrarMensagem('Produto não encontrado', 'error');
         return;
+      }
+
+      // Adiciona cópia do produto (para manter dados estáticos no carrinho)
+      carrinho.push({
+        id: produtoObj.id,
+        nome: produtoObj.nome,
+        preco: Number(produtoObj.preco || 0),
+        imagem: produtoObj.imagem || '/images/placeholder-moto.svg'
+      });
+
+      salvarCarrinhoLocal();
+      mostrarMensagem(`${produtoObj.nome} adicionado ao carrinho! 🛒`);
+    } catch (err) {
+      console.error('Erro ao adicionar ao carrinho:', err);
+      mostrarMensagem('Erro ao adicionar ao carrinho', 'error');
     }
-
-    carrinho.push(produto);
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    atualizarCarrinho();
-    mostrarMensagem(`${produto.nome} adicionado ao carrinho! 🛒`);
-}
-
-function verificarAutenticacao() {
-    if (!userLogado && !window.location.href.includes('login.html') && !window.location.href.includes('cadastro.html')) {
-        window.location.href = './login.html';
-        return false;
-    }
-    return true;
-}
-
-function carregarProdutos() {
-    const container = document.getElementById('produtos-lista') || document.getElementById('produtos-destaque');
-    if (!container) return;
-
-    container.innerHTML = '';
-    localProducts.forEach(prod => {
-        const card = document.createElement('div');
-        card.className = 'produto flip-card';
-        card.innerHTML = `
-        <div class="flip-card-inner">
-          <div class="flip-card-front">
-            <img src="${prod.imagem}" alt="${prod.nome}" onerror="this.src='/images/placeholder-moto.svg'"/>
-            <h3>${prod.nome}</h3>
-            <span class="price-tag">R$ ${prod.preco.toFixed(2)}</span>
-          </div>
-          <div class="flip-card-back">
-            <p>${prod.descricao}</p>
-            <button onclick="adicionarAoCarrinho(${prod.id})">Adicionar ao Carrinho</button>
-          </div>
-        </div>
-        `;
-        container.appendChild(card);
-    });
-
-    // Attach mobile tap event for flip cards
-    document.querySelectorAll('.produto.flip-card').forEach(card => {
-        card.addEventListener('click', () => {
-            card.classList.toggle('flipped');
-        });
-    });
-}
-
-function carregarCarrinho() {
-    console.log('Carregando carrinho...');
-    if (!verificarAutenticacao()) return;
-
-    const lista = document.getElementById("lista-carrinho");
-    const emptyCart = document.getElementById("empty-cart");
-    const cartContainer = document.getElementById("cart-items-container");
-    const itemsCount = document.getElementById("items-count");
-    const subtotalEl = document.getElementById("subtotal");
-    const totalEl = document.getElementById("total-carrinho");
-    const checkoutBtn = document.getElementById("checkout-btn");
-
-    if (!lista) {
-        console.log('Elemento lista-carrinho não encontrado');
-        return;
-    }
-
-    // Calculate totals
-    let subtotal = 0;
-    let frete = 0;
-
-    // Group items by ID to handle quantities
-    const groupedItems = {};
-    carrinho.forEach(item => {
-        if (groupedItems[item.id]) {
-            groupedItems[item.id].quantity += 1;
-        } else {
-            groupedItems[item.id] = {
-                ...item,
-                quantity: 1
-            };
-        }
-    });
-
-    const items = Object.values(groupedItems);
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-
-    if (items.length === 0) {
-        emptyCart.style.display = "block";
-        cartContainer.style.display = "none";
-        if (checkoutBtn) checkoutBtn.disabled = true;
-        return;
-    }
-
-    emptyCart.style.display = "none";
-    cartContainer.style.display = "block";
-    if (checkoutBtn) checkoutBtn.disabled = false;
-
-    // Update items count
-    if (itemsCount) itemsCount.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
-
-    lista.innerHTML = "";
-
-    items.forEach((item) => {
-        const itemTotal = item.preco * item.quantity;
-        subtotal += itemTotal;
-
-        const itemDiv = document.createElement("div");
-        itemDiv.className = "carrinho-item";
-
-        itemDiv.innerHTML = `
-            <img src="${item.imagem || '/images/placeholder-moto.svg'}" alt="${item.nome}" class="item-image" onerror="this.src='/images/placeholder-moto.svg'">
-            <div class="item-details">
-                <span class="item-name">${item.nome}</span>
-                <span class="item-price">R$ ${item.preco.toFixed(2)}</span>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="alterarQuantidade(${item.id}, -1)">−</button>
-                    <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="definirQuantidade(${item.id}, this.value)">
-                    <button class="quantity-btn" onclick="alterarQuantidade(${item.id}, 1)">+</button>
-                </div>
-            </div>
-            <button class="item-remove" onclick="removerItemPorId(${item.id})">Remover</button>
-        `;
-
-        lista.appendChild(itemDiv);
-    });
-
-    // Calculate shipping (free over R$ 50,000)
-    frete = subtotal >= 50000 ? 0 : 150;
-
-    // Update summary
-    if (subtotalEl) subtotalEl.textContent = `R$ ${subtotal.toFixed(2)}`;
-    if (totalEl) totalEl.textContent = `R$ ${(subtotal + frete).toFixed(2)}`;
-
-    atualizarCarrinho();
-}
-
-function removerItem(index) {
-    carrinho.splice(index, 1);
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    carregarCarrinho();
-    mostrarMensagem('Item removido do carrinho');
-}
-
-function alterarQuantidade(itemId, delta) {
-    console.log('Alterando quantidade:', itemId, delta);
-
-    const currentQuantity = carrinho.filter(item => item.id === itemId).length;
-    const newQuantity = Math.max(1, currentQuantity + delta);
-
-    console.log('Quantidade atual:', currentQuantity, 'Nova quantidade:', newQuantity);
-
-    if (newQuantity > currentQuantity) {
-        // Add items
-        const itemTemplate = localProducts.find(p => p.id === itemId);
-        if (itemTemplate) {
-            for (let i = currentQuantity; i < newQuantity; i++) {
-                carrinho.push({...itemTemplate});
-            }
-        }
-    } else if (newQuantity < currentQuantity) {
-        // Remove items
-        let removed = 0;
-        carrinho = carrinho.filter(item => {
-            if (item.id === itemId && removed < (currentQuantity - newQuantity)) {
-                removed++;
-                return false;
-            }
-            return true;
-        });
-    }
-
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    carregarCarrinho();
-    mostrarMensagem(`Quantidade atualizada para ${newQuantity}`);
-}
-
-function definirQuantidade(itemId, quantidade) {
-    const qty = parseInt(quantidade);
-    if (isNaN(qty) || qty < 1) return;
-
-    console.log('Definindo quantidade:', itemId, qty);
-
-    // Remove all items with this ID
-    carrinho = carrinho.filter(item => item.id !== itemId);
-
-    // Find the item template
-    const itemTemplate = localProducts.find(p => p.id === itemId);
-    if (!itemTemplate) {
-        console.error('Item template not found:', itemId);
-        return;
-    }
-
-    // Add the new quantity
-    for (let i = 0; i < qty; i++) {
-        carrinho.push({...itemTemplate});
-    }
-
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    carregarCarrinho();
-    mostrarMensagem(`Quantidade definida para ${qty}`);
+  })();
 }
 
 function removerItemPorId(itemId) {
-    console.log('Removendo item:', itemId);
-    const itemName = localProducts.find(p => p.id === itemId)?.nome || 'Item';
-    carrinho = carrinho.filter(item => item.id !== itemId);
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    carregarCarrinho();
-    mostrarMensagem(`${itemName} removido do carrinho`);
+  const itemName = (carrinho.find(it => it.id === itemId) || {}).nome || 'Item';
+  carrinho = carrinho.filter(item => item.id !== itemId);
+  salvarCarrinhoLocal();
+  mostrarMensagem(`${itemName} removido do carrinho`);
+  // se estiver na página do carrinho, recarrega a lista
+  if (window.location.href.includes('carrinho.html')) carregarCarrinho();
 }
 
-function carregarLoginForm() {
-    const form = document.getElementById('login-form');
-    if (!form) return;
+function alterarQuantidade(itemId, delta) {
+  // Contagem baseada em ocorrências do item
+  const currentQty = carrinho.filter(i => i.id === itemId).length;
+  const newQty = Math.max(1, currentQty + delta);
 
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const username = form.querySelector('#usuario').value.trim();
-        const password = form.querySelector('#senha').value.trim();
-        if (!username || !password) {
-            mostrarMensagem("Preencha todos os campos", "error");
-            return;
-        }
-        // Fake authentication: store user in localStorage
-        userLogado = { username };
-        localStorage.setItem('userLogado', JSON.stringify(userLogado));
-        mostrarMensagem(`Bem vindo, ${username}!`);
-        // Redirect to home after login
-        setTimeout(() => window.location.href = 'index.html', 1000);
-    });
-}
-
-function carregarCadastroForm() {
-    const form = document.getElementById('cadastro-form');
-    if (!form) return;
-
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const username = form.querySelector('#novoUsername').value.trim();
-        const senha = form.querySelector('#novaSenha').value.trim();
-        if (!username || !senha) {
-            mostrarMensagem("Preencha todos os campos", "error");
-            return;
-        }
-        // Fake registration: store user in localStorage
-        userLogado = { username };
-        localStorage.setItem('userLogado', JSON.stringify(userLogado));
-        mostrarMensagem(`Cadastro realizado com sucesso. Bem vindo, ${username}!`);
-        setTimeout(() => window.location.href = 'index.html', 1500);
-    });
-}
-
-async function login(event) {
-    event.preventDefault();
-    const usuario = document.getElementById('usuario').value.trim();
-    const senha = document.getElementById('senha').value.trim();
-    if (!usuario || !senha) {
-        mostrarMensagem("Preencha todos os campos", "error");
+  if (newQty > currentQty) {
+    // adiciona cópias do produto
+    (async () => {
+      const produtoTemplate = await buscarProdutoPorId(itemId);
+      if (!produtoTemplate) {
+        mostrarMensagem('Produto não encontrado', 'error');
         return;
-    }
-
-    // Validar CPF se for formato de CPF (11 dígitos)
-    const cpfLimpo = usuario.replace(/\D/g, '');
-    if (cpfLimpo.length === 11) {
-        if (!validarCPF(usuario)) {
-            mostrarMensagem("CPF inválido", "error");
-            return;
-        }
-    } else if (cpfLimpo.length >= 7 && cpfLimpo.length <= 12) {
-        // Para RG, validação básica
-        if (!validarRG(usuario)) {
-            mostrarMensagem("RG inválido", "error");
-            return;
-        }
-    }
-    // Para outros formatos (email, username), não validar formato
-
-    try {
-        const base = window.API_BASE_URL || (window.location.origin + '/api');
-        const response = await fetch(base + '/usuarios/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuario, senha })
+      }
+      for (let i = currentQty; i < newQty; i++) {
+        carrinho.push({
+          id: produtoTemplate.id,
+          nome: produtoTemplate.nome,
+          preco: Number(produtoTemplate.preco || 0),
+          imagem: produtoTemplate.imagem || '/images/placeholder-moto.svg'
         });
-
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Erro no login');
-        }
-
-        // Store user and token
-        userLogado = data.usuario;
-        localStorage.setItem('userLogado', JSON.stringify(userLogado));
-        localStorage.setItem('user', JSON.stringify(userLogado));
-        localStorage.setItem('token', data.token);
-        mostrarMensagem(`Bem vindo, ${usuario}!`);
-
-        // Check if user is admin and redirect accordingly
-        const redirectUrl = data.usuario.tipo === 'ADMIN' ? './admin.html' : './inicio.html';
-        console.log('Login successful, redirecting to:', redirectUrl);
-        setTimeout(() => {
-            console.log('Executing redirect...');
-            window.location.href = redirectUrl;
-        }, 1000);
-    } catch (error) {
-        console.error('Erro no login:', error);
-        mostrarMensagem(error.message || 'Erro ao fazer login', 'error');
+      }
+      salvarCarrinhoLocal();
+      carregarCarrinho();
+      mostrarMensagem(`Quantidade atualizada para ${newQty}`);
+    })();
+  } else if (newQty < currentQty) {
+    // remove itens excedentes
+    let removeCount = currentQty - newQty;
+    const novo = [];
+    for (const item of carrinho) {
+      if (item.id === itemId && removeCount > 0) {
+        removeCount--;
+        continue;
+      }
+      novo.push(item);
     }
+    carrinho = novo;
+    salvarCarrinhoLocal();
+    carregarCarrinho();
+    mostrarMensagem(`Quantidade atualizada para ${newQty}`);
+  } else {
+    // sem alteração
+    mostrarMensagem(`Quantidade permanece ${newQty}`, 'info');
+  }
+}
+
+function definirQuantidade(itemId, quantidade) {
+  const qty = parseInt(quantidade);
+  if (isNaN(qty) || qty < 1) return;
+  (async () => {
+    const produtoTemplate = await buscarProdutoPorId(itemId);
+    if (!produtoTemplate) {
+      mostrarMensagem('Produto não encontrado', 'error');
+      return;
+    }
+    // remove todos e adiciona novamente
+    carrinho = carrinho.filter(item => item.id !== itemId);
+    for (let i = 0; i < qty; i++) {
+      carrinho.push({
+        id: produtoTemplate.id,
+        nome: produtoTemplate.nome,
+        preco: Number(produtoTemplate.preco || 0),
+        imagem: produtoTemplate.imagem || '/images/placeholder-moto.svg'
+      });
+    }
+    salvarCarrinhoLocal();
+    carregarCarrinho();
+    mostrarMensagem(`Quantidade definida para ${qty}`);
+  })();
+}
+
+// --- Função para renderizar carrinho (carrinho.html) ---
+function carregarCarrinho() {
+  console.log('Carregando carrinho...');
+  carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+  const lista = document.getElementById("lista-carrinho");
+  const emptyCart = document.getElementById("empty-cart");
+  const cartContainer = document.getElementById("cart-items-container");
+  const itemsCount = document.getElementById("items-count");
+  const subtotalEl = document.getElementById("subtotal");
+  const totalEl = document.getElementById("total-carrinho");
+  const checkoutBtn = document.getElementById("checkout-btn");
+
+  if (!lista) {
+    console.log('Elemento lista-carrinho não encontrado');
+    return;
+  }
+
+  // Agrupa por id para somar quantidades
+  const grouped = {};
+  carrinho.forEach(item => {
+    if (grouped[item.id]) grouped[item.id].quantity++;
+    else grouped[item.id] = { ...item, quantity: 1 };
+  });
+
+  const items = Object.values(grouped);
+  const totalItems = items.reduce((s, it) => s + it.quantity, 0);
+
+  if (items.length === 0) {
+    if (emptyCart) emptyCart.style.display = "block";
+    if (cartContainer) cartContainer.style.display = "none";
+    if (checkoutBtn) checkoutBtn.disabled = true;
+    if (itemsCount) itemsCount.textContent = '0 items';
+    if (subtotalEl) subtotalEl.textContent = 'R$ 0,00';
+    if (totalEl) totalEl.textContent = 'R$ 0,00';
+    atualizarContadorCarrinho();
+    return;
+  }
+
+  if (emptyCart) emptyCart.style.display = "none";
+  if (cartContainer) cartContainer.style.display = "block";
+  if (checkoutBtn) checkoutBtn.disabled = false;
+  if (itemsCount) itemsCount.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
+
+  lista.innerHTML = '';
+
+  let subtotal = 0;
+
+  items.forEach(item => {
+    const itemTotal = item.preco * item.quantity;
+    subtotal += itemTotal;
+
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'carrinho-item';
+
+    itemDiv.innerHTML = `
+      <img src="${item.imagem || '/images/placeholder-moto.svg'}" alt="${item.nome}" class="item-image" onerror="this.src='/images/placeholder-moto.svg'">
+      <div class="item-details">
+        <span class="item-name">${item.nome}</span>
+        <span class="item-price">${formatoPrecoBR(item.preco)}</span>
+        <div class="quantity-controls">
+          <button class="quantity-btn" onclick="alterarQuantidade(${item.id}, -1)">−</button>
+          <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="definirQuantidade(${item.id}, this.value)">
+          <button class="quantity-btn" onclick="alterarQuantidade(${item.id}, 1)">+</button>
+        </div>
+      </div>
+      <button class="item-remove" onclick="removerItemPorId(${item.id})">Remover</button>
+    `;
+
+    lista.appendChild(itemDiv);
+  });
+
+  const frete = subtotal >= 50000 ? 0 : 150;
+  if (subtotalEl) subtotalEl.textContent = formatoPrecoBR(subtotal);
+  if (totalEl) totalEl.textContent = formatoPrecoBR(subtotal + frete);
+
+  atualizarContadorCarrinho();
+}
+
+// --- Autenticação (login/cadastro/logout) ---
+async function login(event) {
+  if (event && typeof event.preventDefault === 'function') event.preventDefault();
+
+  const usuarioInput = document.getElementById('usuario');
+  const senhaInput = document.getElementById('senha');
+
+  if (!usuarioInput || !senhaInput) {
+    mostrarMensagem('Formulário de login não encontrado', 'error');
+    return;
+  }
+
+  const usuario = usuarioInput.value.trim();
+  const senha = senhaInput.value.trim();
+
+  if (!usuario || !senha) {
+    mostrarMensagem('Preencha todos os campos', 'error');
+    return;
+  }
+
+  // Envia para API
+  try {
+    const base = window.API_BASE_URL;
+    const res = await fetch(base + '/usuarios/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuario, senha })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const msg = data.error || data.message || 'Erro no login';
+      throw new Error(msg);
+    }
+
+    // Espera que a API retorne { usuario: {...}, token: '...' }
+    userLogado = data.usuario || data.user || { username: usuario };
+    const token = data.token || data.accessToken || null;
+
+    localStorage.setItem('userLogado', JSON.stringify(userLogado));
+    if (token) localStorage.setItem('token', token);
+
+    mostrarMensagem(`Bem vindo, ${userLogado.username || userLogado.nome || usuario}!`, 'success');
+
+    // redireciona (API pode retornar tipo)
+    const redirectUrl = (data.usuario && data.usuario.tipo === 'ADMIN') ? './admin.html' : './inicio.html';
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 800);
+
+  } catch (error) {
+    console.error('Erro no login:', error);
+    mostrarMensagem(error.message || 'Erro ao fazer login', 'error');
+  }
 }
 
 async function cadastrarAPI(event) {
-    event.preventDefault();
-    const username = document.getElementById('novoUsername').value.trim();
-    const nomeCompleto = document.getElementById('novoNomeCompleto').value.trim();
-    const email = document.getElementById('novoEmail').value.trim();
-    const telefone = document.getElementById('novoTelefone').value.trim();
-    const cpf = document.getElementById('novoCPF').value.trim();
-    const senha = document.getElementById('novaSenha').value.trim();
-    if (!username || !nomeCompleto || !email || !senha || !cpf) {
-        mostrarMensagem("Preencha todos os campos obrigatórios", "error");
-        return;
+  if (event && typeof event.preventDefault === 'function') event.preventDefault();
+
+  // coleta campos do form (assumindo IDs do formulário de cadastro)
+  const username = document.getElementById('novoUsername')?.value?.trim();
+  const nomeCompleto = document.getElementById('novoNomeCompleto')?.value?.trim();
+  const email = document.getElementById('novoEmail')?.value?.trim();
+  const telefone = document.getElementById('novoTelefone')?.value?.trim();
+  const cpf = document.getElementById('novoCPF')?.value?.trim();
+  const senha = document.getElementById('novaSenha')?.value?.trim();
+
+  if (!username || !nomeCompleto || !email || !cpf || !senha) {
+    mostrarMensagem('Preencha todos os campos obrigatórios', 'error');
+    return;
+  }
+
+  // Validação simples de CPF se desejar manter (não substitui validação no backend)
+  // Envia para API
+  try {
+    const base = window.API_BASE_URL;
+    const res = await fetch(base + '/usuarios/registro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        nome: nomeCompleto,
+        email,
+        senha,
+        telefone,
+        cpf
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const msg = data.error || data.message || 'Erro no cadastro';
+      throw new Error(msg);
     }
 
-    // Validar CPF
-    if (!validarCPF(cpf)) {
-        mostrarMensagem("CPF inválido", "error");
-        return;
-    }
+    userLogado = data.usuario || data.user || { username };
+    const token = data.token || data.accessToken || null;
 
-    try {
-        const base = window.API_BASE_URL || (window.location.origin + '/api');
-        const response = await fetch(base + '/usuarios/registro', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username,
-                nome: nomeCompleto,
-                email,
-                senha,
-                telefone,
-                cpf
-            })
-        });
+    localStorage.setItem('userLogado', JSON.stringify(userLogado));
+    if (token) localStorage.setItem('token', token);
 
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Erro no cadastro');
-        }
-
-        // Store user and token
-        userLogado = data.usuario;
-        localStorage.setItem('userLogado', JSON.stringify(userLogado));
-        localStorage.setItem('user', JSON.stringify(userLogado));
-        localStorage.setItem('token', data.token);
-        mostrarMensagem(`Cadastro realizado com sucesso. Bem vindo, ${username}!`);
-        setTimeout(() => window.location.href = './inicio.html', 1500);
-    } catch (error) {
-        console.error('Erro no cadastro:', error);
-        mostrarMensagem(error.message || 'Erro ao cadastrar', 'error');
-    }
+    mostrarMensagem('Cadastro realizado com sucesso! Bem vindo.', 'success');
+    setTimeout(() => window.location.href = './inicio.html', 900);
+  } catch (error) {
+    console.error('Erro no cadastro:', error);
+    mostrarMensagem(error.message || 'Erro ao cadastrar', 'error');
+  }
 }
 
 function logout() {
-    localStorage.removeItem('userLogado');
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    userLogado = null;
-    window.location.href = '/';  
+  localStorage.removeItem('userLogado');
+  localStorage.removeItem('user');
+  localStorage.removeItem('token');
+  userLogado = null;
+  mostrarMensagem('Desconectado', 'info');
+  setTimeout(() => window.location.href = '/', 400);
+}
+
+// --- Checkout / Pedidos ---
+function verificarAutenticacao() {
+  userLogado = JSON.parse(localStorage.getItem('userLogado')) || null;
+  if (!userLogado && !window.location.href.includes('login.html') && !window.location.href.includes('cadastro.html')) {
+    window.location.href = './login.html';
+    return false;
+  }
+  return true;
 }
 
 function finalizarCompra() {
-    console.log('Iniciando checkout...');
+  if (!verificarAutenticacao()) return;
 
-    if (carrinho.length === 0) {
-        mostrarMensagem('Seu carrinho está vazio', 'error');
-        return;
-    }
+  if (!carrinho || carrinho.length === 0) {
+    mostrarMensagem('Seu carrinho está vazio', 'error');
+    return;
+  }
 
-    // Check if address is selected
-    const enderecoSelecionado = document.getElementById('endereco-selecionado');
-    if (!enderecoSelecionado || enderecoSelecionado.querySelector('.no-address')) {
-        mostrarMensagem('Selecione um endereço de entrega', 'error');
-        abrirModalEnderecos();
-        return;
-    }
+  // Verifica endereço selecionado
+  const enderecoSelecionado = localStorage.getItem('enderecoSelecionado');
+  if (!enderecoSelecionado) {
+    mostrarMensagem('Selecione um endereço de entrega', 'error');
+    abrirModalEnderecos();
+    return;
+  }
 
-    // Open payment modal
-    abrirModalPagamento();
+  abrirModalPagamento();
 }
 
 function abrirModalPagamento() {
-    const modal = document.getElementById('modal-pagamento');
-    if (modal) {
-        modal.style.display = 'block';
-    }
+  const modal = document.getElementById('modal-pagamento');
+  if (modal) modal.style.display = 'block';
 }
 
 function fecharModalPagamento() {
-    const modal = document.getElementById('modal-pagamento');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+  const modal = document.getElementById('modal-pagamento');
+  if (modal) modal.style.display = 'none';
 }
 
 async function confirmarMetodoPagamento() {
-    const metodoSelecionado = document.querySelector('input[name="metodo-pagamento-modal"]:checked');
-    if (!metodoSelecionado) {
-        mostrarMensagem('Selecione um método de pagamento', 'error');
-        return;
-    }
+  const metodoSelecionado = document.querySelector('input[name="metodo-pagamento-modal"]:checked');
+  if (!metodoSelecionado) {
+    mostrarMensagem('Selecione um método de pagamento', 'error');
+    return;
+  }
 
-    const metodo = metodoSelecionado.value;
-    console.log('Método de pagamento selecionado:', metodo);
+  const metodo = metodoSelecionado.value;
+  const enderecoSelecionado = localStorage.getItem('enderecoSelecionado');
+  if (!enderecoSelecionado) {
+    mostrarMensagem('Selecione um endereço de entrega', 'error');
+    return;
+  }
+  const endereco = JSON.parse(enderecoSelecionado);
 
-    // Get selected address
-    const enderecoSelecionado = localStorage.getItem('enderecoSelecionado');
-    if (!enderecoSelecionado) {
-        mostrarMensagem('Selecione um endereço de entrega', 'error');
-        return;
-    }
+  // Agrupar itens
+  const grouped = {};
+  carrinho.forEach(i => {
+    if (grouped[i.id]) grouped[i.id].quantidade++;
+    else grouped[i.id] = { idProduto: i.id, quantidade: 1 };
+  });
 
-    const endereco = JSON.parse(enderecoSelecionado);
+  const itens = Object.values(grouped).map(it => ({ idProduto: it.idProduto, quantidade: it.quantidade }));
 
-    // Prepare order data
-    const itens = [];
-    const groupedItems = {};
+  const orderData = {
+    itens,
+    idEndereco: endereco.id,
+    metodoPagamento: metodo
+  };
 
-    // Group cart items
-    carrinho.forEach(item => {
-        if (groupedItems[item.id]) {
-            groupedItems[item.id].quantity += 1;
-        } else {
-            groupedItems[item.id] = {
-                idProduto: item.id,
-                quantidade: 1
-            };
-        }
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(window.API_BASE_URL + '/pedidos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      },
+      body: JSON.stringify(orderData)
     });
 
-    // Convert to API format
-    Object.values(groupedItems).forEach(item => {
-        itens.push({
-            idProduto: item.idProduto,
-            quantidade: item.quantidade
-        });
-    });
+    const data = await res.json().catch(() => ({}));
 
-    const orderData = {
-        itens: itens,
-        idEndereco: endereco.id,
-        metodoPagamento: metodo
-    };
-
-    console.log('Enviando pedido:', orderData);
-
-    try {
-        const response = await fetch(window.API_BASE_URL + '/pedidos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            console.log('Pedido criado:', result);
-
-            mostrarMensagem('Compra finalizada com sucesso! 🎉', 'success');
-
-            // Clear cart
-            carrinho = [];
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
-            localStorage.removeItem('enderecoSelecionado');
-        
-            // Close modal and redirect to profile
-            fecharModalPagamento();
-            setTimeout(() => {
-                window.location.href = './perfil.html';
-            }, 2000);
-        } else {
-            const error = await response.json();
-            console.error('Erro ao criar pedido:', error);
-            mostrarMensagem(error.error || 'Erro ao finalizar compra', 'error');
-        }
-    } catch (error) {
-        console.error('Erro de rede ao criar pedido:', error);
-        mostrarMensagem('Erro de conexão. Tente novamente.', 'error');
+    if (!res.ok) {
+      const msg = data.error || data.message || 'Erro ao criar pedido';
+      throw new Error(msg);
     }
+
+    mostrarMensagem('Compra finalizada com sucesso! 🎉', 'success');
+    // limpa carrinho
+    carrinho = [];
+    salvarCarrinhoLocal();
+    localStorage.removeItem('enderecoSelecionado');
+    fecharModalPagamento();
+    setTimeout(() => window.location.href = './perfil.html', 900);
+
+  } catch (err) {
+    console.error('Erro ao criar pedido:', err);
+    mostrarMensagem(err.message || 'Erro ao finalizar compra', 'error');
+  }
 }
 
-// Address modal functions
+// --- Modal Endereços e CRUD de endereços ---
 function abrirModalEnderecos() {
-    console.log('Abrindo modal de endereços');
-    const modal = document.getElementById('modal-enderecos');
-    if (modal) {
-        modal.style.display = 'block';
-        carregarEnderecos();
-    }
+  const modal = document.getElementById('modal-enderecos');
+  if (modal) {
+    modal.style.display = 'block';
+    carregarEnderecos();
+  }
 }
 
 function fecharModalEnderecos() {
-    const modal = document.getElementById('modal-enderecos');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+  const modal = document.getElementById('modal-enderecos');
+  if (modal) modal.style.display = 'none';
 }
 
 function abrirModalNovoEndereco() {
-    console.log('Abrindo modal de novo endereço');
-    fecharModalEnderecos();
-    const modal = document.getElementById('modal-novo-endereco');
-    if (modal) {
-        modal.style.display = 'block';
-    }
+  fecharModalEnderecos();
+  const modal = document.getElementById('modal-novo-endereco');
+  if (modal) modal.style.display = 'block';
 }
 
 function fecharModalNovoEndereco() {
-    const modal = document.getElementById('modal-novo-endereco');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+  const modal = document.getElementById('modal-novo-endereco');
+  if (modal) modal.style.display = 'none';
 }
 
 async function carregarEnderecos() {
-    console.log('Carregando endereços...');
-    const listaEnderecos = document.getElementById('lista-enderecos');
-    if (!listaEnderecos) return;
+  const listaEnderecos = document.getElementById('lista-enderecos');
+  if (!listaEnderecos) return;
 
-    try {
-        const response = await fetch(window.API_BASE_URL + '/enderecos', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-
-        if (response.ok) {
-            const enderecos = await response.json();
-            listaEnderecos.innerHTML = '';
-
-            if (enderecos.length === 0) {
-                listaEnderecos.innerHTML = '<p>Nenhum endereço cadastrado.</p>';
-            } else {
-                enderecos.forEach(endereco => {
-                    const enderecoDiv = document.createElement('div');
-                    enderecoDiv.className = 'endereco-item';
-                    enderecoDiv.innerHTML = `
-                        <div class="endereco-info">
-                            <strong>${endereco.apelido || 'Endereço'}</strong><br>
-                            ${endereco.logradouro}, ${endereco.numero}<br>
-                            ${endereco.bairro} - ${endereco.localidade}/${endereco.uf}<br>
-                            CEP: ${endereco.cep}
-                        </div>
-                        <button class="btn-secondary" onclick="selecionarEndereco(${endereco.codEndereco}, '${endereco.apelido || 'Endereço'}', '${endereco.logradouro}, ${endereco.numero} - ${endereco.bairro}')">Selecionar</button>
-                    `;
-                    listaEnderecos.appendChild(enderecoDiv);
-                });
-            }
-        } else {
-            listaEnderecos.innerHTML = '<p>Erro ao carregar endereços.</p>';
-        }
-    } catch (error) {
-        console.error('Erro ao carregar endereços:', error);
-        listaEnderecos.innerHTML = '<p>Erro ao carregar endereços.</p>';
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(window.API_BASE_URL + '/enderecos', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    if (!res.ok) {
+      // mostra erro simples
+      listaEnderecos.innerHTML = '<p>Erro ao carregar endereços.</p>';
+      return;
     }
-}
-
-function selecionarEndereco(id, apelido, endereco) {
-    console.log('Selecionando endereço:', id, apelido);
-
-    const enderecoSelecionado = document.getElementById('endereco-selecionado');
-    if (enderecoSelecionado) {
-        enderecoSelecionado.innerHTML = `
-            <div class="endereco-selecionado-info">
-                <strong>📍 ${apelido}</strong><br>
-                <span>${endereco}</span><br>
-                <button class="btn-link" onclick="abrirModalEnderecos()">Alterar</button>
-            </div>
-        `;
+    const enderecos = await res.json();
+    listaEnderecos.innerHTML = '';
+    if (!Array.isArray(enderecos) || enderecos.length === 0) {
+      listaEnderecos.innerHTML = '<p>Nenhum endereço cadastrado.</p>';
+      return;
     }
 
-    // Store selected address
-    localStorage.setItem('enderecoSelecionado', JSON.stringify({ id, apelido, endereco }));
+    enderecos.forEach(endereco => {
+      const enderecoDiv = document.createElement('div');
+      enderecoDiv.className = 'endereco-item';
+      enderecoDiv.innerHTML = `
+        <div class="endereco-info">
+          <strong>${endereco.apelido || 'Endereço'}</strong><br>
+          ${endereco.logradouro}, ${endereco.numero || ''}<br>
+          ${endereco.bairro || ''} - ${endereco.localidade || ''}/${endereco.uf || ''}<br>
+          CEP: ${endereco.cep || ''}
+        </div>
+        <button class="btn-secondary" onclick="selecionarEndereco(${endereco.codEndereco || endereco.id}, '${(endereco.apelido || 'Endereço').replace(/'/g,"\\'")}', '${(endereco.logradouro || '') + (endereco.numero ? ', ' + endereco.numero : '')}')">Selecionar</button>
+      `;
+      listaEnderecos.appendChild(enderecoDiv);
+    });
 
-    fecharModalEnderecos();
-    mostrarMensagem('Endereço selecionado com sucesso!');
+  } catch (err) {
+    console.error('Erro ao carregar endereços:', err);
+    listaEnderecos.innerHTML = '<p>Erro ao carregar endereços.</p>';
+  }
 }
 
+function selecionarEndereco(id, apelido, enderecoTexto) {
+  const enderecoSelecionadoEl = document.getElementById('endereco-selecionado');
+  if (enderecoSelecionadoEl) {
+    enderecoSelecionadoEl.innerHTML = `
+      <div class="endereco-selecionado-info">
+        <strong>📍 ${apelido}</strong><br>
+        <span>${enderecoTexto}</span><br>
+        <button class="btn-link" onclick="abrirModalEnderecos()">Alterar</button>
+      </div>
+    `;
+  }
+
+  localStorage.setItem('enderecoSelecionado', JSON.stringify({ id, apelido, endereco: enderecoTexto }));
+  fecharModalEnderecos();
+  mostrarMensagem('Endereço selecionado com sucesso!');
+}
+
+// Busca CEP via ViaCEP
 async function buscarCEP() {
-    const cepInput = document.getElementById('cep');
-    const cep = cepInput.value.replace(/\D/g, '');
+  const cepInput = document.getElementById('cep');
+  if (!cepInput) return;
+  const cep = cepInput.value.replace(/\D/g, '');
+  if (cep.length !== 8) {
+    mostrarMensagem('CEP deve ter 8 dígitos', 'error');
+    return;
+  }
 
-    if (cep.length !== 8) {
-        mostrarMensagem('CEP deve ter 8 dígitos', 'error');
-        return;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await res.json();
+    if (data.erro) {
+      mostrarMensagem('CEP não encontrado', 'error');
+      return;
     }
-
-    try {
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-        const data = await response.json();
-
-        if (data.erro) {
-            mostrarMensagem('CEP não encontrado', 'error');
-            return;
-        }
-
-        // Preencher campos
-        document.getElementById('logradouro').value = data.logradouro || '';
-        document.getElementById('bairro').value = data.bairro || '';
-        document.getElementById('localidade').value = data.localidade || '';
-        document.getElementById('uf').value = data.uf || '';
-
-        mostrarMensagem('CEP encontrado e campos preenchidos!');
-    } catch (error) {
-        console.error('Erro ao buscar CEP:', error);
-        mostrarMensagem('Erro ao buscar CEP', 'error');
-    }
+    document.getElementById('logradouro').value = data.logradouro || '';
+    document.getElementById('bairro').value = data.bairro || '';
+    document.getElementById('localidade').value = data.localidade || '';
+    document.getElementById('uf').value = data.uf || '';
+    mostrarMensagem('CEP encontrado e campos preenchidos!');
+  } catch (err) {
+    console.error('Erro ao buscar CEP:', err);
+    mostrarMensagem('Erro ao buscar CEP', 'error');
+  }
 }
 
-document.getElementById('form-novo-endereco')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
+// Submissão do formulário de novo endereço
+document.getElementById('form-novo-endereco')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
 
-    const formData = new FormData(this);
-    const enderecoData = {
-        cep: formData.get('cep'),
-        logradouro: formData.get('logradouro'),
-        numero: formData.get('numero'),
-        complemento: formData.get('complemento'),
-        bairro: formData.get('bairro'),
-        localidade: formData.get('localidade'),
-        uf: formData.get('uf'),
-        apelido: formData.get('apelido'),
-        is_principal: formData.get('is_principal') === 'on'
-    };
+  const form = this;
+  const formData = new FormData(form);
+  const enderecoData = {
+    cep: formData.get('cep'),
+    logradouro: formData.get('logradouro'),
+    numero: formData.get('numero'),
+    complemento: formData.get('complemento'),
+    bairro: formData.get('bairro'),
+    localidade: formData.get('localidade'),
+    uf: formData.get('uf'),
+    apelido: formData.get('apelido'),
+    is_principal: formData.get('is_principal') === 'on'
+  };
 
-    console.log('Enviando dados do endereço:', enderecoData);
-    console.log('Token:', localStorage.getItem('token'));
-    console.log('API URL:', window.API_BASE_URL + '/enderecos');
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(window.API_BASE_URL + '/enderecos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      },
+      body: JSON.stringify(enderecoData)
+    });
 
-    try {
-        const response = await fetch(window.API_BASE_URL + '/enderecos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(enderecoData)
-        });
-
-        console.log('Resposta do servidor:', response.status, response.statusText);
-
-        if (response.ok) {
-            const result = await response.json();
-            console.log('Endereço criado:', result);
-            mostrarMensagem('Endereço cadastrado com sucesso!');
-            fecharModalNovoEndereco();
-            // Reload addresses
-            setTimeout(() => abrirModalEnderecos(), 500);
-        } else {
-            const error = await response.json();
-            console.error('Erro do servidor:', error);
-            mostrarMensagem(error.error || 'Erro ao cadastrar endereço', 'error');
-        }
-    } catch (error) {
-        console.error('Erro de rede ao cadastrar endereço:', error);
-        mostrarMensagem('Erro de conexão. Verifique se o servidor está rodando.', 'error');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = data.error || data.message || 'Erro ao cadastrar endereço';
+      throw new Error(msg);
     }
+
+    mostrarMensagem('Endereço cadastrado com sucesso!');
+    fecharModalNovoEndereco();
+    setTimeout(() => abrirModalEnderecos(), 400);
+  } catch (err) {
+    console.error('Erro ao cadastrar endereço:', err);
+    mostrarMensagem(err.message || 'Erro ao cadastrar endereço', 'error');
+  }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    atualizarCarrinho();
+// --- DOMContentLoaded: inicializações ---
+document.addEventListener('DOMContentLoaded', async () => {
+  atualizarContadorCarrinho();
 
-    if (window.location.href.includes('produtos.html')) {
+  // Se houver formulários de login/cadastro, ligar os handlers
+  if (window.location.href.includes('login.html')) {
+    const form = document.getElementById('login-form');
+    if (form) form.addEventListener('submit', login);
+  }
+
+  if (window.location.href.includes('cadastro.html')) {
+    const form = document.getElementById('cadastro-form');
+    if (form) form.addEventListener('submit', cadastrarAPI);
+  }
+
+  if (window.location.href.includes('carrinho.html')) {
+    carregarCarrinho();
+  }
+
+  // Se houver página de produtos (legacy), tenta carregar do servidor
+  if (window.location.href.includes('produtos.html')) {
+    // Tenta utilizar carregarProdutos from init.js (se disponível) - caso exista, chama
+    if (typeof carregarProdutos === 'function') {
+      try {
         carregarProdutos();
+      } catch (e) {
+        console.warn('carregarProdutos indisponível ou falhou:', e);
+      }
+    } else {
+      // fallback simples: pega produtos da API e renderiza com inserir manual
+      try {
+        const produtos = (typeof fetchProductsAPI === 'function') ? await fetchProductsAPI() : produtosFallback;
+        const container = document.getElementById('produtos-lista') || document.getElementById('produtos-destaque');
+        if (container) {
+          container.innerHTML = '';
+          produtos.forEach(prod => {
+            const card = document.createElement('div');
+            card.className = 'produto flip-card';
+            card.innerHTML = `
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <img src="${prod.imagem || '/images/placeholder-moto.svg'}" alt="${prod.nome}" onerror="this.src='/images/placeholder-moto.svg'"/>
+                  <h3>${prod.nome}</h3>
+                  <span class="price-tag">${formatoPrecoBR(prod.preco)}</span>
+                </div>
+                <div class="flip-card-back">
+                  <p>${prod.descricao}</p>
+                  <button onclick="adicionarAoCarrinho(${prod.id})">Adicionar ao Carrinho</button>
+                </div>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+          // event listeners para flip cards em mobile
+          document.querySelectorAll('.produto.flip-card').forEach(card => {
+            card.addEventListener('click', () => card.classList.toggle('flipped'));
+          });
+        }
+      } catch (e) {
+        console.error('Erro ao renderizar produtos na página:', e);
+      }
     }
-    else if (window.location.href.includes('carrinho.html')) {
-        carregarCarrinho();
-    }
-    else if (window.location.href.includes('login.html')) {
-        carregarLoginForm();
-    }
-    else if (window.location.href.includes('cadastro.html')) {
-        carregarCadastroForm();
-    }
+  }
 });
 
-// Make cart functions globally available
+// --- Funções utilitárias expostas para o frontend (HTML) ---
+window.adicionarAoCarrinho = adicionarAoCarrinho;
 window.alterarQuantidade = alterarQuantidade;
 window.definirQuantidade = definirQuantidade;
 window.removerItemPorId = removerItemPorId;
+window.carregarCarrinho = carregarCarrinho;
+window.login = login;
+window.cadastrarAPI = cadastrarAPI;
+window.logout = logout;
 window.finalizarCompra = finalizarCompra;
 window.abrirModalPagamento = abrirModalPagamento;
 window.fecharModalPagamento = fecharModalPagamento;
 window.confirmarMetodoPagamento = confirmarMetodoPagamento;
-
-// Password toggle function
-function toggleSenha(inputId) {
-    const input = document.getElementById(inputId);
-    const toggleBtn = input.nextElementSibling;
-    if (input.type === 'password') {
-        input.type = 'text';
-        toggleBtn.textContent = '🙈'; // Closed eye when visible
-    } else {
-        input.type = 'password';
-        toggleBtn.textContent = '👁'; // Open eye when hidden
-    }
-}
-
-// Make functions globally available
-window.toggleSenha = toggleSenha;
 window.abrirModalEnderecos = abrirModalEnderecos;
 window.fecharModalEnderecos = fecharModalEnderecos;
 window.abrirModalNovoEndereco = abrirModalNovoEndereco;
 window.fecharModalNovoEndereco = fecharModalNovoEndereco;
 window.buscarCEP = buscarCEP;
 window.selecionarEndereco = selecionarEndereco;
+
+// Password toggle helper (se o HTML usar)
+window.toggleSenha = function (inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const toggleBtn = input.nextElementSibling;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (toggleBtn) toggleBtn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    if (toggleBtn) toggleBtn.textContent = '👁';
+  }
+};
+
+// Manter compatibilidade: atualizar contador no load
+setTimeout(atualizarContadorCarrinho, 200);
