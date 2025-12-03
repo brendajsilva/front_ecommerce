@@ -1,15 +1,15 @@
 // Inicialização do frontend: contador do carrinho e produtos em destaque
 
-// Configurar URL da API
 window.API_BASE_URL = 'https://backendecommerce-production-ce37.up.railway.app';
 
+// Atualiza contador do carrinho
 function atualizarContadorCarrinho() {
   const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
   const countEl = document.getElementById('cart-count');
   if (countEl) countEl.textContent = carrinho.length;
 }
 
-// Produtos fallback (caso a API falhe)
+// Produtos locais (fallback caso API falhe)
 const produtosDestaque = [
   {
     id: 1,
@@ -17,7 +17,7 @@ const produtosDestaque = [
     preco: 82000.0,
     imagem: '/images/bmws1000rr.png',
     destaque: true,
-    descricao: 'Superbike alemã com motor 4 cilindros em linha de 999cc...',
+    descricao: 'Superbike alemã com motor 4 cilindros...',
     categoria: 'Esportiva',
     potencia: 207,
     disponivel: true
@@ -28,7 +28,7 @@ const produtosDestaque = [
     preco: 95000.0,
     imagem: '/images/DucatiDiavel.png',
     destaque: true,
-    descricao: 'Power cruiser italiana com motor V4 Granturismo...',
+    descricao: 'Power cruiser italiana V4...',
     categoria: 'Custom',
     potencia: 168,
     disponivel: true
@@ -39,7 +39,7 @@ const produtosDestaque = [
     preco: 125000.0,
     imagem: '/images/ducativ4s.png',
     destaque: true,
-    descricao: 'Superbike italiana com motor V4 de 1103cc...',
+    descricao: 'Superbike italiana V4...',
     categoria: 'Esportiva',
     potencia: 214,
     disponivel: true
@@ -50,7 +50,7 @@ const produtosDestaque = [
     preco: 135000.0,
     imagem: '/images/h2r.png',
     destaque: true,
-    descricao: 'Hyperbike japonesa com motor supercharged...',
+    descricao: 'Hyperbike supercharged...',
     categoria: 'Esportiva',
     potencia: 310,
     disponivel: true
@@ -61,41 +61,38 @@ const produtosDestaque = [
     preco: 78000.0,
     imagem: '/images/z1000.png',
     destaque: true,
-    descricao: 'Naked sport japonesa com motor 4 cilindros...',
+    descricao: 'Naked sport japonesa...',
     categoria: 'Naked',
     potencia: 142,
     disponivel: true
   }
 ];
 
-function formatoPreco(valor) {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function formatoPreco(v) {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// ==============================
-// BUSCAR PRODUTOS DA API
-// ==============================
+// BUSCA API
 async function fetchProductsAPI() {
-  const base = window.API_BASE_URL;
-
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 
-    // CORRIGIDO: rota certa → /produtos
-    const res = await fetch(base + '/produtos', { signal: controller.signal });
+    const res = await fetch(window.API_BASE_URL + '/produtos', {
+      signal: controller.signal
+    });
 
     clearTimeout(timeout);
-    if (!res.ok) throw new Error('Erro ao buscar API');
+    if (!res.ok) throw new Error("Falha API");
 
     const data = await res.json();
-    if (!Array.isArray(data)) throw new Error('Resposta inválida');
+    if (!Array.isArray(data)) throw new Error("Formato inválido");
 
     return data.map(p => ({
-      id: p.codProduto || p.id || 0,
+      id: p.codProduto || p.id,
       nome: p.nome || 'Produto',
-      preco: parseFloat(p.preco || 0),
-      imagem: (p.imagem_url || '/images/placeholder-moto.svg'),
+      preco: Number(p.preco || 0),
+      imagem: p.imagem_url || '/images/placeholder-moto.svg',
       descricao: p.descricao || '',
       categoria: p.categoria || 'Esportiva',
       potencia: p.potencia || null,
@@ -104,19 +101,17 @@ async function fetchProductsAPI() {
     }));
 
   } catch (err) {
-    console.warn('Erro na API, usando fallback local:', err.message);
+    console.warn("Erro API, usando fallback:", err.message);
     return produtosDestaque;
   }
 }
 
-// Placeholder de imagem
-function handleImageError(imgEl) {
-  try {
-    imgEl.src = '/images/placeholder-moto.svg';
-  } catch (e) {}
+// Placeholder
+function handleImageError(el) {
+  el.src = '/images/placeholder-moto.svg';
 }
 
-// Renderização dos produtos em destaque
+// Renderizar destaques
 async function renderizarProdutosDestaque() {
   const lista = await fetchProductsAPI();
 
@@ -135,7 +130,6 @@ async function renderizarProdutosDestaque() {
       const inner = document.createElement('div');
       inner.className = 'flip-card-inner';
 
-      // Frente
       const front = document.createElement('div');
       front.className = 'flip-card-front';
 
@@ -148,114 +142,56 @@ async function renderizarProdutosDestaque() {
       imgWrap.appendChild(priceTag);
 
       const imgEl = document.createElement('img');
+      imgEl.src = prod.imagem;
       imgEl.alt = prod.nome;
-      imgEl.src = prod.imagem || '/images/placeholder-moto.svg';
       imgEl.onerror = () => handleImageError(imgEl);
       imgWrap.appendChild(imgEl);
 
       const body = document.createElement('div');
       body.className = 'card-body';
-      body.innerHTML = `<h3>${prod.nome}</h3><p class="descricao">${prod.descricao}</p>`;
+      body.innerHTML = `<h3>${prod.nome}</h3><p>${prod.descricao}</p>`;
 
       front.appendChild(imgWrap);
       front.appendChild(body);
 
-      // Verso
       const back = document.createElement('div');
       back.className = 'flip-card-back';
       back.innerHTML = `
-          <div class="back-content">
-            <h3>${prod.nome}</h3>
-            <p class="descricao">${prod.descricao}</p>
-            <ul class="specs">
-              <li>Categoria: ${prod.categoria}</li>
-              <li>Disponibilidade: ${prod.disponivel ? 'Em estoque' : 'Sob encomenda'}</li>
-            </ul>
-            <div class="back-footer">
-              <span class="preco">${formatoPreco(prod.preco)}</span>
-              <button class="add-cart" onclick="adicionarAoCarrinho(${prod.id})">Adicionar ao Carrinho</button>
-            </div>
-          </div>
-        `;
+        <h3>${prod.nome}</h3>
+        <p>${prod.descricao}</p>
+        <ul>
+          <li>Categoria: ${prod.categoria}</li>
+          <li>Potência: ${prod.potencia || 'N/A'} HP</li>
+        </ul>
+        <button onclick="adicionarAoCarrinho(${prod.id})">Comprar</button>
+      `;
 
       inner.appendChild(front);
       inner.appendChild(back);
       card.appendChild(inner);
-
-      card.addEventListener('click', function () {
-        if (window.matchMedia('(hover: none)').matches) {
-          this.classList.toggle('is-flipped');
-        }
-      });
 
       container.appendChild(card);
     });
   });
 }
 
-function renderizarProdutosIndex() {
-  fetchProductsAPI().then(produtos => {
-    const container = document.getElementById('index-produtos');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    produtos.forEach(prod => {
-      const div = document.createElement('div');
-      div.className = 'produto';
-
-      const imgWrap = document.createElement('div');
-      imgWrap.className = 'card-image';
-
-      const priceTag = document.createElement('div');
-      priceTag.className = 'price-tag';
-      priceTag.textContent = formatoPreco(prod.preco);
-      imgWrap.appendChild(priceTag);
-
-      const imgEl = document.createElement('img');
-      imgEl.alt = prod.nome;
-      imgEl.src = prod.imagem;
-      imgEl.onerror = () => handleImageError(imgEl);
-      imgWrap.appendChild(imgEl);
-
-      const body = document.createElement('div');
-      body.className = 'card-body';
-      body.innerHTML = `<h3>${prod.nome}</h3><p class="descricao">${prod.descricao}</p>`;
-
-      const footer = document.createElement('div');
-      footer.className = 'card-footer';
-      footer.innerHTML = `<span class="preco">${formatoPreco(prod.preco)}</span>`;
-      const btn = document.createElement('button');
-      btn.textContent = 'Adicionar ao Carrinho';
-      btn.onclick = () => adicionarAoCarrinho(prod.id);
-      footer.appendChild(btn);
-
-      div.appendChild(imgWrap);
-      div.appendChild(body);
-      div.appendChild(footer);
-
-      container.appendChild(div);
-    });
-  });
-}
-
+// Carregar página produtos.html
 async function carregarProdutosPagina() {
   const listaContainer = document.getElementById('lista-produtos');
-  const loadingSpinner = document.getElementById('loading-spinner');
-  const noProductsMsg = document.getElementById('no-products');
+  const loading = document.getElementById('loading-spinner');
+  const empty = document.getElementById('no-products');
 
   if (!listaContainer) return;
 
-  loadingSpinner.style.display = 'block';
-  listaContainer.innerHTML = '';
-  noProductsMsg.style.display = 'none';
+  loading.style.display = "block";
+  empty.style.display = "none";
 
   try {
     const produtos = await fetchProductsAPI();
-    loadingSpinner.style.display = 'none';
+    loading.style.display = "none";
 
-    if (produtos.length === 0) {
-      noProductsMsg.style.display = 'block';
+    if (!produtos.length) {
+      empty.style.display = "block";
       return;
     }
 
@@ -263,62 +199,44 @@ async function carregarProdutosPagina() {
     window.produtosFiltrados = [...produtos];
 
     renderizarProdutosFiltrados();
-  } catch (error) {
-    console.error('Erro ao carregar produtos:', error);
-    loadingSpinner.style.display = 'none';
-    noProductsMsg.style.display = 'block';
+
+  } catch (err) {
+    loading.style.display = "none";
+    empty.style.display = "block";
   }
 }
 
-let todosProdutos = [];
-let produtosFiltrados = [];
-
+// Filtro
 function filtrarProdutos() {
-  const categoriaSelect = document.getElementById('filter-category');
-  const ordenacaoSelect = document.getElementById('sort-by');
-  const searchInput = document.querySelector('.search-input');
+  const categoria = document.getElementById('filter-category')?.value;
+  const ordenacao = document.getElementById('sort-by')?.value;
+  const termo = document.querySelector('.search-input')?.value.toLowerCase() || "";
 
-  if (!categoriaSelect || !ordenacaoSelect || !searchInput) return;
+  produtosFiltrados = todosProdutos.filter(p =>
+    (categoria === 'all' || p.categoria.toLowerCase() === categoria.toLowerCase()) &&
+    (p.nome.toLowerCase().includes(termo) ||
+     p.descricao.toLowerCase().includes(termo))
+  );
 
-  const categoria = categoriaSelect.value;
-  const ordenacao = ordenacaoSelect.value;
-  const termoBusca = searchInput.value.toLowerCase().trim();
-
-  produtosFiltrados = todosProdutos.filter(produto => {
-    const matchCategoria = categoria === 'all' || produto.categoria === categoria;
-    const matchBusca =
-      produto.nome.toLowerCase().includes(termoBusca) ||
-      produto.descricao.toLowerCase().includes(termoBusca) ||
-      (produto.categoria || '').toLowerCase().includes(termoBusca);
-
-    return matchCategoria && matchBusca;
-  });
-
-  produtosFiltrados.sort((a, b) => {
-    switch (ordenacao) {
-      case 'price-asc': return a.preco - b.preco;
-      case 'price-desc': return b.preco - a.preco;
-      default: return 0;
-    }
-  });
+  if (ordenacao === 'price-asc') produtosFiltrados.sort((a, b) => a.preco - b.preco);
+  if (ordenacao === 'price-desc') produtosFiltrados.sort((a, b) => b.preco - a.preco);
 
   renderizarProdutosFiltrados();
 }
 
+// Renderizar filtrados
 function renderizarProdutosFiltrados() {
   const container = document.getElementById('lista-produtos');
-  const noProductsMsg = document.getElementById('no-products');
-
-  if (!container) return;
+  const empty = document.getElementById('no-products');
 
   container.innerHTML = '';
 
-  if (produtosFiltrados.length === 0) {
-    noProductsMsg.style.display = 'block';
+  if (!produtosFiltrados.length) {
+    empty.style.display = 'block';
     return;
   }
 
-  noProductsMsg.style.display = 'none';
+  empty.style.display = 'none';
 
   produtosFiltrados.forEach(prod => {
     const card = document.createElement('div');
@@ -330,75 +248,39 @@ function renderizarProdutosFiltrados() {
     const front = document.createElement('div');
     front.className = 'flip-card-front';
 
-    const imgWrap = document.createElement('div');
-    imgWrap.className = 'card-image';
+    const img = document.createElement('img');
+    img.src = prod.imagem;
+    img.alt = prod.nome;
+    img.onerror = () => handleImageError(img);
 
-    const priceTag = document.createElement('div');
-    priceTag.className = 'price-tag';
-    priceTag.textContent = formatoPreco(prod.preco);
-    imgWrap.appendChild(priceTag);
-
-    const imgEl = document.createElement('img');
-    imgEl.alt = prod.nome;
-    imgEl.src = prod.imagem;
-    imgEl.onerror = () => handleImageError(imgEl);
-    imgWrap.appendChild(imgEl);
-
-    const body = document.createElement('div');
-    body.className = 'card-body';
-    body.innerHTML = `<h3>${prod.nome}</h3><p class="categoria">${prod.categoria}</p>`;
-
-    front.appendChild(imgWrap);
-    front.appendChild(body);
+    front.appendChild(img);
+    front.innerHTML += `<h3>${prod.nome}</h3><p>${prod.categoria}</p>`;
 
     const back = document.createElement('div');
     back.className = 'flip-card-back';
     back.innerHTML = `
-      <div class="back-content">
-        <h3>${prod.nome}</h3>
-        <p class="descricao">${prod.descricao}</p>
-        <ul class="specs">
-          <li><strong>Potência:</strong> ${prod.potencia || 'N/A'} HP</li>
-          <li><strong>Categoria:</strong> ${prod.categoria}</li>
-          <li><strong>Disponibilidade:</strong> ${prod.disponivel ? 'Em estoque' : 'Sob encomenda'}</li>
-        </ul>
-        <div class="back-footer">
-          <span class="preco">${formatoPreco(prod.preco)}</span>
-          <button class="add-cart" onclick="adicionarAoCarrinho(${prod.id})">Adicionar ao Carrinho</button>
-        </div>
-      </div>
+      <h3>${prod.nome}</h3>
+      <p>${prod.descricao}</p>
+      <button onclick="adicionarAoCarrinho(${prod.id})">Adicionar ao Carrinho</button>
     `;
 
     inner.appendChild(front);
     inner.appendChild(back);
     card.appendChild(inner);
 
-    card.addEventListener('click', function () {
-      if (window.matchMedia('(hover: none)').matches) {
-        this.classList.toggle('is-flipped');
-      }
-    });
-
     container.appendChild(card);
   });
 }
 
+// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   atualizarContadorCarrinho();
   renderizarProdutosDestaque();
 
-  if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-    renderizarProdutosIndex();
-  }
-
-  if (window.location.pathname.includes('produtos.html')) {
+  if (location.pathname.includes('produtos.html')) {
     carregarProdutosPagina();
-    const categoriaSelect = document.getElementById('filter-category');
-    const ordenacaoSelect = document.getElementById('sort-by');
-    const searchInput = document.querySelector('.search-input');
-
-    if (categoriaSelect) categoriaSelect.addEventListener('change', filtrarProdutos);
-    if (ordenacaoSelect) ordenacaoSelect.addEventListener('change', filtrarProdutos);
-    if (searchInput) searchInput.addEventListener('input', filtrarProdutos);
+    document.getElementById('filter-category')?.addEventListener('change', filtrarProdutos);
+    document.getElementById('sort-by')?.addEventListener('change', filtrarProdutos);
+    document.querySelector('.search-input')?.addEventListener('input', filtrarProdutos);
   }
 });
