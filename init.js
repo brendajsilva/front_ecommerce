@@ -1,4 +1,4 @@
-// Inicialização do frontend: contador do carrinho e produtos em destaque
+front// Inicialização do frontend: contador do carrinho e produtos em destaque
 
 // Configurar URL da API
 window.API_BASE_URL = 'https://backendecommerce-production-ce37.up.railway.app';
