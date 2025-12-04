@@ -95,7 +95,7 @@ async function fetchProductsAPI() {
       id: p.codProduto || p.id || 0,
       nome: p.nome || 'Produto',
       preco: parseFloat(p.preco || 0),
-      imagem: (p.imagem_url || '/images/placeholder-moto.svg'),
+      imagem: (p.imagem_url || "/images/ducativ4s.png"),
       descricao: p.descricao || '',
       categoria: p.categoria || 'Esportiva',
       potencia: p.potencia || null,
@@ -112,7 +112,7 @@ async function fetchProductsAPI() {
 // Placeholder de imagem
 function handleImageError(imgEl) {
   try {
-    imgEl.src = '/images/placeholder-moto.svg';
+    imgEl.src = '/images/ducativ4s.png';
   } catch (e) {}
 }
 
@@ -149,7 +149,7 @@ async function renderizarProdutosDestaque() {
 
       const imgEl = document.createElement('img');
       imgEl.alt = prod.nome;
-      imgEl.src = prod.imagem || '/images/placeholder-moto.svg';
+      imgEl.src = prod.imagem || '/images/ducativ4s.png';
       imgEl.onerror = () => handleImageError(imgEl);
       imgWrap.appendChild(imgEl);
 
